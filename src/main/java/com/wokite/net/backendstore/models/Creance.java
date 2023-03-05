@@ -61,8 +61,8 @@ public class Creance implements Serializable {
     @Column(name = "status", length = 90)
     private String status;
 
-    @Column(name = "dateCreance", length = 150)
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy", timezone = "GMT")
+ /*   @Column(name = "dateCreance")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy", timezone = "GMT")*/
     private Date dateCreance;
 
     @OneToMany(mappedBy = "creance", fetch = FetchType.LAZY)
