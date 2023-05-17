@@ -1,13 +1,17 @@
 package com.wokite.net.backendstore;
 
-import com.wokite.net.backendstore.models.*;
+import com.wokite.net.backendstore.enums.RoleName;
+import com.wokite.net.backendstore.models.Role;
+import com.wokite.net.backendstore.models.Utilisateur;
 import com.wokite.net.backendstore.repository.*;
+import com.wokite.net.backendstore.services.UtilisateurService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import java.util.Date;
+
 
 @SpringBootApplication
 @RequiredArgsConstructor
@@ -23,6 +27,15 @@ public class BackendstoreApplication implements CommandLineRunner {
     private final VenteRepository venteRepository;
     private final LigneVenteRepository ligneVenteRepository;
     private final UtilisateurRepository utilisateurRepository;
+    private final RoleRepository roleRepository;
+
+    @Autowired
+    private UtilisateurService utilisateurService;
+
+    /*
+    @Autowired
+    private PasswordEncoder bCryptPasswordEncoder;
+    */
 
 
     public static void main(String[] args) {
@@ -31,48 +44,61 @@ public class BackendstoreApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+
 /*
+        Category category = categoryRepository.save(new Category(1L, "CAT01", "Ordinateur portable"));
+        Category category02 = categoryRepository.save(new Category(2L, "CAT02", "Téléphone portable"));
+        Category category03 = categoryRepository.save(new Category(3L, "CAT06", "Boisson"));
+        Category category04 = categoryRepository.save(new Category(4L, "CAT07", "Eau minérale"));
+        Category category05 = categoryRepository.save(new Category(5L, "CAT09", "Nescafé"));
 
-        Category category = categoryRepository.save(new Category(1L, "CAT01", "Category01"));
-        Category category02 = categoryRepository.save(new Category(2L, "CAT02", "Category02"));
-        Category category03 = categoryRepository.save(new Category(3L, "CAT03", "Category03"));
-        Category category04 = categoryRepository.save(new Category(4L, "CAT04", "Category04"));
-        Category category05 = categoryRepository.save(new Category(5L, "CAT005", "Category05"));
+        SubCategory SubCategory = subCategoryRepository.save(new SubCategory(1L, "SUBCAT01", "Ordinateur portable HP", category));
+        SubCategory SubCategory02 = subCategoryRepository.save(new SubCategory(2L, "SUBCAT02", "Ordinateur portable DELL", category));
+        SubCategory SubCategory03 = subCategoryRepository.save(new SubCategory(3L, "SUBCAT03", "Téléphone portable IPhone", category02));
+        SubCategory SubCategory04 = subCategoryRepository.save(new SubCategory(4L, "SUBCAT04", "Téléphone portable Samsung", category02));
+        SubCategory SubCategory05 = subCategoryRepository.save(new SubCategory(5L, "SUBCAT05", "Boisson Gazeuse", category03));
+        SubCategory SubCategory06 = subCategoryRepository.save(new SubCategory(6L, "SUBCAT06", "Bierre", category03));
+        SubCategory SubCategory07 = subCategoryRepository.save(new SubCategory(7L, "SUBCAT07", "Casamançaise", category04));
+        SubCategory SubCategory08 = subCategoryRepository.save(new SubCategory(8L, "SUBCAT08", "Kirène", category04));
 
-        SubCategory SubCategory = subCategoryRepository.save(new SubCategory(1L, "SUBCAT01", "Category01", category));
-        SubCategory SubCategory02 = subCategoryRepository.save(new SubCategory(2L, "CAT02", "Category02", category02));
-        SubCategory SubCategory03 = subCategoryRepository.save(new SubCategory(3L, "CAT03", "Category03", category03));
-        SubCategory SubCategory04 = subCategoryRepository.save(new SubCategory(4L, "CAT04", "Category04", category04));
-        SubCategory SubCategory05 = subCategoryRepository.save(new SubCategory(5L, "CAT005", "Category05", category05));
+        SubCategory SubCategory09 = subCategoryRepository.save(new SubCategory(9L, "SUBCAT09", "Gold Intenso", category05));
+        SubCategory SubCategory010 = subCategoryRepository.save(new SubCategory(10L, "SUBCAT010", "Nescafé", category05));
 
+        Product product = productRepository.save(new Product(1L, "123456789", "HP elitebook core i7 vPro", 760000.0, 790000.0, 12, SubCategory));
+        Product product02 = productRepository.save(new Product(2L, "459789", "HP Probook core i5", 320000.0, 500000.0, 6, SubCategory));
+        Product product03 = productRepository.save(new Product(3L, "678912346", "Dell Promodel core i7", 540000.0, 720000.0, 2, SubCategory02));
+        Product product04 = productRepository.save(new Product(4L, "810987654", "Iphone 14s", 460000.0, 660000.0, 10, SubCategory03));
+        Product product05 = productRepository.save(new Product(5L, "5789985", "Iphone 12s", 320000.0, 530000.0, 8, SubCategory03));
+        Product product06 = productRepository.save(new Product(6L, "12345678915", "Samsung A23", 11000.0, 125000.0, 16, SubCategory04));
+        Product product07 = productRepository.save(new Product(7L, "012345678915", "Samsung A32", 130000.0, 145000.0, 16, SubCategory04));
+        Product product08 = productRepository.save(new Product(8L, "80987654", "Coca cola", 680.0, 800.0, 10, SubCategory05));
+        Product product09 = productRepository.save(new Product(9L, "51789985", "Fanta", 680.0, 800.0, 8, SubCategory05));
+        Product product010 = productRepository.save(new Product(10L, "112345678915", "Malta", 890.0, 1250.0, 16, SubCategory06));
+        Product product011 = productRepository.save(new Product(11L, "22345678915", "Malta", 890.0, 1250.0, 16, SubCategory06));
+        Product product012 = productRepository.save(new Product(12L, "52789985", "Casamançaise 1L", 360.0, 500.0, 8, SubCategory07));
+        Product product013 = productRepository.save(new Product(13L, "42345678915", "Casamançaise 5L", 760.0, 1100.0, 16, SubCategory07));
+        Product product014 = productRepository.save(new Product(14L, "62345678915", "Kirène 1L", 390.0, 500.0, 16, SubCategory08));
+        Product product015 = productRepository.save(new Product(15L, "53789985", "Kirène 5L", 820.0, 1100.0, 8, SubCategory08));
+        Product product016 = productRepository.save(new Product(16L, "72345678915", "Gold Intenso PM", 1800.0, 2500.0, 16, SubCategory09));
+        Product product017 = productRepository.save(new Product(17L, "82345678915", "Gold Intenso GM", 5500.0, 6000.0, 16, SubCategory09));
+        Product product018 = productRepository.save(new Product(18L, "92345678915", "Nescafé PM", 680.0, 900.0, 16, SubCategory010));
+        Product product019 = productRepository.save(new Product(19L, "102345678915", "Nescafé GM", 1100.0, 1900.0, 16, SubCategory010));
 
-        Product product = productRepository.save(new Product(1L, "123456789", "Product01", 1200.0, 2000.0, 12, SubCategory));
-        Product product02 = productRepository.save(new Product(2L, "459789", "Product02", 3200.0, 5000.0, 6, SubCategory02));
-        Product product03 = productRepository.save(new Product(3L, "678912346", "Product03", 6000.0, 7000.0, 2, SubCategory03));
-        Product product04 = productRepository.save(new Product(4L, "5789985", "Product04", 6700.0, 8000.0, 8, SubCategory04));
-        Product product05 = productRepository.save(new Product(5L, "80987654", "Product05", 8500.0, 10000.0, 10, SubCategory05));
-        Product product06 = productRepository.save(new Product(6L, "12345678915", "Product06", 8000.0, 9000.0, 16, SubCategory02));
+        Fournisseur fournisseur = fournisseurRepository.save(new Fournisseur(1L, "Wokite", "12345678-BOA", "779440310", "contact@wokite.net"));
+		Fournisseur fournisseur02 = fournisseurRepository.save(new Fournisseur(2L, "SAT", "987654321-BNDE", "77940310", "support@sat.com"));
+		Fournisseur fournisseur03 = fournisseurRepository.save(new Fournisseur(3L, "FIIT", "23456789-CBEAO", "77440310", "contact@fiit.com"));
+		Fournisseur fournisseur04 = fournisseurRepository.save(new Fournisseur(4L, "Sunuchauffeur", "12346543-ECOBANK", "79440310", "contact@sunuchauffeur.com"));
+		Fournisseur fournisseur05 = fournisseurRepository.save(new Fournisseur(5L, "Fournisseur05", "20FFA", "77944031", "fournisseur05.net"));
+		Fournisseur fournisseur06 = fournisseurRepository.save(new Fournisseur(6L, "Fournisseur06", "2023A6", "7669440310", "fournisseur06.net"));
+		Fournisseur fournisseur07 = fournisseurRepository.save(new Fournisseur(7L, "Fournisseur07", "2F023A7", "777740310", "fournisseur07.net"));
+		Fournisseur fournisseur08 = fournisseurRepository.save(new Fournisseur(8L, "Fournisseur08", "F2F3A8", "88440310", "fournisseur08.net"));
+		Fournisseur fournisseur09 = fournisseurRepository.save(new Fournisseur(9L, "Fournisseur09", "20FA9", "79940310", "fournisseur09.net"));
+		Fournisseur fournisseur10 = fournisseurRepository.save(new Fournisseur(10L, "Fournisseur010", "20FFA10", "107944031", "fournisseur010.net"));
 
-		Fournisseur fournisseur = fournisseurRepository.save(new Fournisseur(1L, "Wokite", "2023A", "779440310", "wokite.net"));
-		Fournisseur fournisseur02 = fournisseurRepository.save(new Fournisseur(2L, "FFF02", "2F023A", "77940310", "wokite02.net"));
-		Fournisseur fournisseur03 = fournisseurRepository.save(new Fournisseur(3L, "FFF03", "F2F3A", "77440310", "wokite03.net"));
-		Fournisseur fournisseur04 = fournisseurRepository.save(new Fournisseur(4L, "FFF04", "20FA", "79440310", "wokite04.net"));
-		Fournisseur fournisseur05 = fournisseurRepository.save(new Fournisseur(5L, "FFF05", "20FFA", "77944031", "wokite05.net"));
-		Fournisseur fournisseur06 = fournisseurRepository.save(new Fournisseur(6L, "Wokite6", "2023A6", "7669440310", "wokite06.net"));
-		Fournisseur fournisseur07 = fournisseurRepository.save(new Fournisseur(7L, "FFF027", "2F023A7", "777740310", "wokite07.net"));
-		Fournisseur fournisseur08 = fournisseurRepository.save(new Fournisseur(8L, "FFF038", "F2F3A8", "88440310", "wokite08.net"));
-		Fournisseur fournisseur09 = fournisseurRepository.save(new Fournisseur(9L, "FFF049", "20FA9", "79940310", "wokite09.net"));
-		Fournisseur fournisseur10 = fournisseurRepository.save(new Fournisseur(10L, "FFF0510", "20FFA10", "107944031", "wokite10.net"));
-		Fournisseur fournisseur11 = fournisseurRepository.save(new Fournisseur(11L, "Wokite11", "2023A11", "1179440310", "wokite11.net"));
-		Fournisseur fournisseur12 = fournisseurRepository.save(new Fournisseur(12L, "FFF012", "2F023A12", "127940310", "wokite12.net"));
-		Fournisseur fournisseur13 = fournisseurRepository.save(new Fournisseur(13L, "FFF013", "F2F3A13", "137440310", "wokite13.net"));
-		Fournisseur fournisseur14 = fournisseurRepository.save(new Fournisseur(14L, "FFF014", "20FA14", "1479440310", "wokite14.net"));
-		Fournisseur fournisseur15 = fournisseurRepository.save(new Fournisseur(15L, "FFF015", "20FFA15", "1577944031", "wokite15.net"));
-
-        Client client = clientRepository.save(new Client(1L, "Client", "778643217", "client@gmail.com"));
-        Client client02 = clientRepository.save(new Client(2L, "Client02", "777643217", "client02@gmail.com"));
-        Client client03 = clientRepository.save(new Client(3L, "Client03", "768643217", "client03@gmail.com"));
-        Client client04 = clientRepository.save(new Client(4L, "Client04", "788643217", "client04@gmail.com"));
+        Client client = clientRepository.save(new Client(1L, "Wokite", "778643217", "contact@wokite.net"));
+        Client client02 = clientRepository.save(new Client(2L, "Sunuchauffeur", "777643217", "contact@sunuchauffeur.com"));
+        Client client03 = clientRepository.save(new Client(3L, "ParfumD&P", "768643217", "contact@parfumdp.sn"));
+        Client client04 = clientRepository.save(new Client(4L, "Funteks", "788643217", "support@funteks.com"));
         Client client05 = clientRepository.save(new Client(5L, "Client05", "778543217", "client05@gmail.com"));
 
         Utilisateur utilisateur = new Utilisateur();
@@ -177,10 +203,60 @@ public class BackendstoreApplication implements CommandLineRunner {
 		ligneVente3.setVente(vente3);ligneVente3.setPrixVente(1200.0);ligneVente3.setQuantite(2);ligneVente3.setProduct(product04);
 		ligneVenteRepository.save(ligneVente3);
 
-        */
+
+
+        Role vendorRole = roleRepository.save(new Role(RoleName.ROLE_VENDEUR));
+        Role gerantRole = roleRepository.save(new Role(RoleName.ROLE_GERANT));
+        Role managerRole = roleRepository.save(new Role(RoleName.ROLE_MANAGER));
+        Role adminRole = roleRepository.save(new Role(RoleName.ROLE_ADMIN));
 
 
 
+
+        Role vendorRole = roleRepository.save(new Role(RoleName.ROLE_VENDEUR));
+        Role gerantRole = roleRepository.save(new Role(RoleName.ROLE_GERANT));
+        Role managerRole = roleRepository.save(new Role(RoleName.ROLE_MANAGER));
+        Role adminRole = roleRepository.save(new Role(RoleName.ROLE_ADMIN));
+
+
+        Utilisateur admin = new Utilisateur();
+        admin.setUsername("admin");
+        admin.setName("Administrator");
+        admin.setEmail("admin@gmail.com");
+        admin.setActive(true);
+        admin.setPassword(bCryptPasswordEncoder.encode("admin"));
+        utilisateurRepository.save(admin);
+        utilisateurService.addRoleToUser("admin", RoleName.ROLE_ADMIN);
+
+        Utilisateur manager = new Utilisateur();
+        manager.setUsername("manager");
+        manager.setName("Manageur");
+        manager.setEmail("manager@gmail.com");
+        manager.setActive(true);
+        manager.setPassword(bCryptPasswordEncoder.encode("manager"));
+        utilisateurRepository.save(manager);
+        utilisateurService.addRoleToUser("manager", RoleName.ROLE_MANAGER);
+
+        Utilisateur gerant = new Utilisateur();
+        gerant.setUsername("gerant");
+        gerant.setName("Gerant");
+        gerant.setEmail("gerant@gmail.com");
+        gerant.setActive(true);
+        gerant.setPassword(bCryptPasswordEncoder.encode("gerant"));
+        utilisateurRepository.save(gerant);
+        utilisateurService.addRoleToUser("gerant", RoleName.ROLE_GERANT);
+
+        Utilisateur vendeur = new Utilisateur();
+        vendeur.setUsername("vendeur");
+        vendeur.setName("Vendeur");
+        vendeur.setEmail("vendeur@gmail.com");
+        vendeur.setActive(true);
+        vendeur.setPassword(bCryptPasswordEncoder.encode("vendeur"));
+        utilisateurRepository.save(vendeur);
+        utilisateurService.addRoleToUser("vendeur", RoleName.ROLE_VENDEUR);
+
+
+ */
 
     }
 }

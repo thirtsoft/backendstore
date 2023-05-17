@@ -7,19 +7,24 @@ import com.wokite.net.backendstore.models.Utilisateur;
 import com.wokite.net.backendstore.repository.RoleRepository;
 import com.wokite.net.backendstore.repository.UtilisateurRepository;
 import com.wokite.net.backendstore.services.UtilisateurService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@Transactional
 public class UtilisateurServiceImpl implements UtilisateurService {
 
-    @Autowired private UtilisateurRepository utilisateurRepository;
+    private final UtilisateurRepository utilisateurRepository;
 
-    @Autowired
-    private RoleRepository roleRepository;
+    private final RoleRepository roleRepository;
+
+    public UtilisateurServiceImpl(UtilisateurRepository utilisateurRepository, RoleRepository roleRepository) {
+        this.utilisateurRepository = utilisateurRepository;
+        this.roleRepository = roleRepository;
+    }
 
 
     @Override

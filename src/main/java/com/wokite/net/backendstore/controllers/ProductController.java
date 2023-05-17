@@ -94,6 +94,12 @@ public class ProductController implements ProductApi {
     }
 
     @Override
+    public ResponseEntity<List<Product>> getAllProductOrderAsc() {
+        List<Product> productList = productService.findListProductByOrderByDesignationAsc();
+        return new ResponseEntity<>(productList, HttpStatus.OK);
+    }
+
+    @Override
     public ResponseEntity<List<Product>> getProductsBySubCategoriesId(Long scatId) {
         List<Product> productList = productService.findProductBySubCategoryId(scatId);
         return new ResponseEntity<>(productList, HttpStatus.OK);

@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
 import javax.validation.Valid;
@@ -16,10 +17,9 @@ import java.util.List;
 
 @Entity
 @Table(name = "vente")
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
+@SuperBuilder
 public class Vente implements Serializable {
 
     @Id
@@ -54,9 +54,94 @@ public class Vente implements Serializable {
     private List<LigneVente> ligneVentes = new ArrayList<>();
 
     @ManyToOne
-  //  @JoinColumn(name = "userId", nullable = false)
-    @JoinColumn(name = "userId")
+    @JoinColumn(name = "userId", nullable = false)
     private Utilisateur utilisateur;
 
+    @Column(name = "actif")
+    private int actif;
 
+    public void setActif(boolean actif) {
+        if (actif)
+            this.actif = 1;
+        else
+            this.actif = 0;
+    }
+
+    public boolean isActif() {
+        if (actif == 1)
+            return true;
+        return false;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getNumeroVente() {
+        return numeroVente;
+    }
+
+    public void setNumeroVente(Long numeroVente) {
+        this.numeroVente = numeroVente;
+    }
+
+    public Double getTotalVente() {
+        return totalVente;
+    }
+
+    public void setTotalVente(Double totalVente) {
+        this.totalVente = totalVente;
+    }
+
+    public Double getMontantReglement() {
+        return montantReglement;
+    }
+
+    public void setMontantReglement(Double montantReglement) {
+        this.montantReglement = montantReglement;
+    }
+
+    public String getTypeReglement() {
+        return typeReglement;
+    }
+
+    public void setTypeReglement(String typeReglement) {
+        this.typeReglement = typeReglement;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public Date getDateVente() {
+        return dateVente;
+    }
+
+    public void setDateVente(Date dateVente) {
+        this.dateVente = dateVente;
+    }
+
+    public List<LigneVente> getLigneVentes() {
+        return ligneVentes;
+    }
+
+    public void setLigneVentes(List<LigneVente> ligneVentes) {
+        this.ligneVentes = ligneVentes;
+    }
+
+    public Utilisateur getUtilisateur() {
+        return utilisateur;
+    }
+
+    public void setUtilisateur(Utilisateur utilisateur) {
+        this.utilisateur = utilisateur;
+    }
 }

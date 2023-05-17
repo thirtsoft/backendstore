@@ -1,9 +1,7 @@
 package com.wokite.net.backendstore.models;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -14,7 +12,8 @@ import java.io.Serializable;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
+@ToString
+@SuperBuilder
 public class Product implements Serializable {
 
     @Id
@@ -22,7 +21,7 @@ public class Product implements Serializable {
     private Long id;
 
     @Column(name = "barcode", unique = true)
-    @NotNull
+//    @NotNull
     private String barCode;
 
     @Column(name = "reference", unique = true)
@@ -53,9 +52,24 @@ public class Product implements Serializable {
     @Column(name = "stockInitial")
     private int stockInitial;
 
+    @Column(name = "actif")
+    private int actif;
+
+    public void setActif(boolean actif) {
+        if (actif)
+            this.actif = 1;
+        else
+            this.actif = 0;
+    }
+
+    public boolean isActif() {
+        if (actif == 1)
+            return true;
+        return false;
+    }
 
     @ManyToOne
-    @JoinColumn(name = "subcat_id")
+    @JoinColumn(name = "subcat_id", nullable = false)
     private SubCategory subCategory;
 
     public Product(Long id, String barCode, String designation, Double prixAchat, Double prixVente, int qtestock, SubCategory subCategory) {
@@ -67,4 +81,6 @@ public class Product implements Serializable {
         this.qtestock = qtestock;
         this.subCategory = subCategory;
     }
+
+
 }

@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
 import javax.validation.Valid;
@@ -19,7 +20,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
+@SuperBuilder
 public class Commande implements Serializable {
 
     @Id
@@ -58,10 +59,24 @@ public class Commande implements Serializable {
     private Client client;
 
     @ManyToOne
-    @JoinColumn(name = "userId")
-   // @JoinColumn(name = "userId", nullable = false)
+    @JoinColumn(name = "userId", nullable = false)
     private Utilisateur utilisateur;
 
+    @Column(name = "actif")
+    private int actif;
+
+    public void setActif(boolean actif) {
+        if (actif)
+            this.actif = 1;
+        else
+            this.actif = 0;
+    }
+
+    public boolean isActif() {
+        if (actif == 1)
+            return true;
+        return false;
+    }
 
     public Commande(Long numeroCommande, Double totalCommande, Double montantReglement, String typeReglement, String status, Date dateCommande) {
         this.numeroCommande = numeroCommande;

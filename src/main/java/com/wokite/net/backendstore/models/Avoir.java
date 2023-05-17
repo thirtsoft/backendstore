@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
 import javax.validation.Valid;
@@ -19,7 +20,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
+@SuperBuilder
 public class Avoir implements Serializable {
 
     @Id
@@ -56,6 +57,22 @@ public class Avoir implements Serializable {
     @OneToMany(mappedBy = "avoir", fetch = FetchType.LAZY)
     @Valid
     private List<LigneAvoir> lavoirs = new ArrayList<>();
+
+    @Column(name = "actif")
+    private int actif;
+
+    public void setActif(boolean actif) {
+        if (actif)
+            this.actif = 1;
+        else
+            this.actif = 0;
+    }
+
+    public boolean isActif() {
+        if (actif == 1)
+            return true;
+        return false;
+    }
 
 
 }

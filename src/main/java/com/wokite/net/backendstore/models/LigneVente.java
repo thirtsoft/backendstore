@@ -12,10 +12,6 @@ import java.io.Serializable;
 
 @Entity
 @Table(name = "ligneVente")
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
 public class LigneVente implements Serializable {
 
     @Id
@@ -47,4 +43,59 @@ public class LigneVente implements Serializable {
     @JoinColumn(name = "prod_id")
     private Product product;
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getNumeroVente() {
+        return numeroVente;
+    }
+
+    public void setNumeroVente(Long numeroVente) {
+        this.numeroVente = numeroVente;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public int getQuantite() {
+        return quantite;
+    }
+
+    public void setQuantite(int quantite) {
+        this.quantite = quantite;
+    }
+
+    public Double getPrixVente() {
+        return prixVente;
+    }
+
+    public void setPrixVente(Double prixVente) {
+        this.prixVente = prixVente;
+    }
+
+    public Vente getVente() {
+        return vente;
+    }
+
+    public void setVente(Vente vente) {
+        this.vente = vente;
+    }
+
+    public Product getProduct() {
+        return product;
+    }
+
+    public void setProduct(Product product) {
+        this.product = product;
+    }
 }

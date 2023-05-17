@@ -1,10 +1,10 @@
 package com.wokite.net.backendstore.models;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
 import javax.validation.Valid;
@@ -28,7 +28,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
+@SuperBuilder
 public class Creance implements Serializable {
 
     @Id
@@ -61,27 +61,37 @@ public class Creance implements Serializable {
     @Column(name = "status", length = 90)
     private String status;
 
- /*   @Column(name = "dateCreance")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy", timezone = "GMT")*/
+    /*   @Column(name = "dateCreance")
+       @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy", timezone = "GMT")*/
     private Date dateCreance;
 
     @OneToMany(mappedBy = "creance", fetch = FetchType.LAZY)
     @Valid
     private List<LigneCreance> lcreances = new ArrayList<>();
-/*
-    @ManyToOne
-    @JoinColumn(name = "client_id")
-    private Client client;*/
+
     @ManyToOne
     @JoinColumn(name = "client_id", nullable = false)
     private Client client;
 
-    /*
     @ManyToOne
     @JoinColumn(name = "userId", nullable = false)
-    private Utilisateur utilisateur;*/
+    private Utilisateur utilisateur;
 
+    @Column(name = "actif")
+    private int actif;
 
+    public void setActif(boolean actif) {
+        if (actif)
+            this.actif = 1;
+        else
+            this.actif = 0;
+    }
+
+    public boolean isActif() {
+        if (actif == 1)
+            return true;
+        return false;
+    }
 
 
 

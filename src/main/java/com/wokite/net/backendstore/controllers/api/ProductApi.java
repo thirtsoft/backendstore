@@ -84,6 +84,15 @@ public interface ProductApi {
     })
     ResponseEntity<List<Product>> getAllProductOrderDesc();
 
+    @GetMapping(value = APP_ROOT + "/products/allProductOrderByDesignationAsc", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Renvoi la liste des Product",
+            notes = "Cette méthode permet de chercher et renvoyer la liste des Product",
+            responseContainer = "List<Product>")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "La liste des Product / une liste vide")
+    })
+    ResponseEntity<List<Product>> getAllProductOrderAsc();
+
     @GetMapping(value = APP_ROOT + "/products/searchListProductsBySubCategoryId", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Renvoi la liste des Product par scategorie",
             notes = "Cette méthode permet de chercher et renvoyer la liste des Product par scategorie", responseContainer = "List<Product>")

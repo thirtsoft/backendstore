@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
@@ -15,26 +16,28 @@ import java.io.Serializable;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
+@SuperBuilder
 public class Employe implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull
     @Column(name = "cni", length = 100, unique = true)
     private String cni;
 
+    @NotNull
     @Column(name = "prenom", length = 150)
     private String prenom;
 
+    @NotNull
     @Column(name = "nom", length = 90)
     private String nom;
 
     @Column(name = "address", length = 150)
     private String address;
 
+    @NotNull
     @Column(name = "telephone", length = 50, unique = true)
     private String telephone;
 
@@ -44,5 +47,21 @@ public class Employe implements Serializable {
     @Email
     @Column(name = "email", length = 90, unique = true)
     private String email;
+
+    @Column(name = "actif")
+    private int actif;
+
+    public void setActif(boolean actif) {
+        if (actif)
+            this.actif = 1;
+        else
+            this.actif = 0;
+    }
+
+    public boolean isActif() {
+        if (actif == 1)
+            return true;
+        return false;
+    }
 
 }

@@ -1,6 +1,8 @@
 package com.wokite.net.backendstore.repository;
 
 import com.wokite.net.backendstore.models.Product;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -12,12 +14,18 @@ import java.util.Optional;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
+    @Query("Select DISTINCT act from Product act where act.actif=1")
+    List<Product> findAll();
+
+    @Query("Select DISTINCT act from Product act where act.actif=1")
+    Page<Product> findAll(Pageable pageable);
+
     Product findByReference(String reference);
 
     @Query("select p from Product p where p.designation like :des")
     Product findByDesignation(@Param("des") String designation);
 
-    @Query("select p from Product p where p.prixAchat like :price")
+    @Query(value = "select p from Product p where p.prixAchat like :price")
     Product findByPrixAchat(@Param("price") Double prixAchat);
 
     @Query("select p from Product p where p.subCategory.id =:scat")
@@ -42,6 +50,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     Optional<Product> findByBarCode(String barCode);
 
-    @Query("select p from Product p order by designation Asc")
+    @Query(value = "select p from Product p order by p.designation Asc")
     List<Product> findListProductByOrderByDesignationAsc();
 }

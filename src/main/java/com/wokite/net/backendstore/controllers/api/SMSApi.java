@@ -1,6 +1,6 @@
 package com.wokite.net.backendstore.controllers.api;
 
-import com.sun.xml.internal.ws.api.message.Message;
+
 import com.wokite.net.backendstore.models.Client;
 import com.wokite.net.backendstore.models.Fournisseur;
 import com.wokite.net.backendstore.models.SubCategory;
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import static com.wokite.net.backendstore.utils.Constants.APP_ROOT;
 
 public interface SMSApi {
-
+/*
     @PostMapping(value = APP_ROOT + "/sendSMSToFournisseur")
     @ApiOperation(value = "Envoyer un sms au Fournisseur",
             notes = "Cette méthode permet d'envoyer un sms au Fournisseur")
@@ -31,5 +31,7 @@ public interface SMSApi {
             @ApiResponse(code = 400, message = "Aucun SMS envoyé")
     })
     Message sendSMSToCustomer(@RequestBody Client client);
+
+ */
 
 }

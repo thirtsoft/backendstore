@@ -26,7 +26,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
-@CrossOrigin
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 public class CategoryController implements CategoryApi {
 
