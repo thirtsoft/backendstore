@@ -4,7 +4,6 @@ import com.wokite.net.backendstore.exceptions.ResourceNotFoundException;
 import com.wokite.net.backendstore.models.Fournisseur;
 import com.wokite.net.backendstore.repository.FournisseurRepository;
 import com.wokite.net.backendstore.services.FournisseurService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,7 +14,11 @@ import java.util.Optional;
 @Transactional
 public class FournisseurServiceImpl implements FournisseurService {
 
-    @Autowired private FournisseurRepository fournisseurRepository;
+    private final FournisseurRepository fournisseurRepository;
+
+    public FournisseurServiceImpl(FournisseurRepository fournisseurRepository) {
+        this.fournisseurRepository = fournisseurRepository;
+    }
 
     @Override
     public Fournisseur saveFournisseur(Fournisseur fournisseur) {
@@ -76,7 +79,9 @@ public class FournisseurServiceImpl implements FournisseurService {
         if (fourId == null) {
             throw new ResourceNotFoundException("Fournisseur not found");
         }
-        fournisseurRepository.deleteById(fourId);
+        Fournisseur fournisseur = fournisseurRepository.findById(fourId).get();
+        fournisseur.setActif(false);
+        fournisseurRepository.save(fournisseur);
 
     }
 }

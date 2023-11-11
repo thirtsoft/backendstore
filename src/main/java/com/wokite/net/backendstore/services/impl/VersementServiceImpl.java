@@ -4,7 +4,6 @@ import com.wokite.net.backendstore.exceptions.ResourceNotFoundException;
 import com.wokite.net.backendstore.models.Versement;
 import com.wokite.net.backendstore.repository.VersementRepository;
 import com.wokite.net.backendstore.services.VersementService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,8 +15,11 @@ import java.util.Optional;
 @Transactional
 public class VersementServiceImpl implements VersementService {
 
-    @Autowired
-    private VersementRepository versementRepository;
+    private final VersementRepository versementRepository;
+
+    public VersementServiceImpl(VersementRepository versementRepository) {
+        this.versementRepository = versementRepository;
+    }
 
     @Override
     public Versement saveVersement(Versement versement) {
@@ -78,6 +80,8 @@ public class VersementServiceImpl implements VersementService {
         if (!versementRepository.existsById(id)) {
             throw new ResourceNotFoundException("Versement Not found");
         }
-        versementRepository.deleteById(id);
+        Versement versement = versementRepository.findById(id).get();
+        versement.setActif(false);
+        versementRepository.save(versement);
     }
 }

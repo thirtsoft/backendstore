@@ -4,7 +4,6 @@ import com.wokite.net.backendstore.exceptions.ResourceNotFoundException;
 import com.wokite.net.backendstore.models.Client;
 import com.wokite.net.backendstore.repository.ClientRepository;
 import com.wokite.net.backendstore.services.ClientService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,7 +14,11 @@ import java.util.Optional;
 @Transactional
 public class ClientServiceImpl implements ClientService {
 
-    @Autowired private ClientRepository clientRepository;
+    private final ClientRepository clientRepository;
+
+    public ClientServiceImpl(ClientRepository clientRepository) {
+        this.clientRepository = clientRepository;
+    }
 
     @Override
     public Client saveClient(Client client) {
@@ -83,6 +86,8 @@ public class ClientServiceImpl implements ClientService {
         if (!clientRepository.existsById(id)) {
             throw new ResourceNotFoundException("Client not found");
         }
-        clientRepository.deleteById(id);
+        Client client = clientRepository.findById(id).get();
+        client.setActif(false);
+        clientRepository.save(client);
     }
 }

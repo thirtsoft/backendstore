@@ -11,11 +11,6 @@ import java.util.List;
 @Repository
 public interface TypeDepenseRepository extends JpaRepository<TypeDepense, Long> {
 
-    TypeDepense findByCodeCategoryCharge(String codeCategoryCharge);
-
-    @Query("select c from TypeDepense c where c.codeCategoryCharge like :c")
-    List<TypeDepense> ListCategoryChargeByCodeCategoryCharge(@Param("c") String codeCategoryCharge);
-
     @Query("select c from TypeDepense c where c.designation like :des")
     TypeDepense findByDesignation(@Param("des") String designation);
 

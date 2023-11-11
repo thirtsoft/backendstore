@@ -4,7 +4,6 @@ import com.wokite.net.backendstore.exceptions.ResourceNotFoundException;
 import com.wokite.net.backendstore.models.TypeDepense;
 import com.wokite.net.backendstore.repository.TypeDepenseRepository;
 import com.wokite.net.backendstore.services.TypeDepenseService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,14 +14,14 @@ import java.util.Optional;
 @Transactional
 public class TypeDepenseServiceImpl implements TypeDepenseService {
 
-    @Autowired
-    private TypeDepenseRepository typeDepenseRepository;
+    private final TypeDepenseRepository typeDepenseRepository;
+
+    public TypeDepenseServiceImpl(TypeDepenseRepository typeDepenseRepository) {
+        this.typeDepenseRepository = typeDepenseRepository;
+    }
 
     @Override
     public TypeDepense saveCategoryCharge(TypeDepense typeDepense) {
-        if (typeDepenseRepository.findByCodeCategoryCharge(typeDepense.getCodeCategoryCharge()) != null) {
-            throw new IllegalArgumentException("Category de charge existe");
-        }
         return typeDepenseRepository.save(typeDepense);
     }
 
@@ -35,11 +34,8 @@ public class TypeDepenseServiceImpl implements TypeDepenseService {
         if (!optionalCategoryCharge.isPresent()) {
             throw new ResourceNotFoundException("This CategoryCharge is not found");
         }
-
         TypeDepense typeDepenseResult = optionalCategoryCharge.get();
-        typeDepenseResult.setCodeCategoryCharge(typeDepense.getCodeCategoryCharge());
         typeDepenseResult.setDesignation(typeDepense.getDesignation());
-
         return typeDepenseRepository.save(typeDepenseResult);
     }
 
@@ -67,6 +63,8 @@ public class TypeDepenseServiceImpl implements TypeDepenseService {
         if (!typeDepenseRepository.existsById(catId)) {
             throw new ResourceNotFoundException("This CategoryCharge is not found");
         }
-        typeDepenseRepository.deleteById(catId);
+        TypeDepense typeDepense = typeDepenseRepository.findById(catId).get();
+        typeDepense.setActif(false);
+        typeDepenseRepository.save(typeDepense);
     }
 }

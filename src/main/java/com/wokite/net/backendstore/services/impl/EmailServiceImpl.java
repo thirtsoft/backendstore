@@ -56,15 +56,10 @@ public class EmailServiceImpl implements EmailService {
     public void sendMail(Fournisseur fournisseur) throws MailException {
         StringBuilder sb = new StringBuilder();
         sb.append("Nom : " + EmailConstants.managerName).append(System.lineSeparator());
-        sb.append("\n Subject : " + fournisseur.getSubject());
-        sb.append("\n Message : " + fournisseur.getMessage());
-
         SimpleMailMessage mail = new SimpleMailMessage();
 
         mail.setTo(fournisseur.getEmail());
         mail.setFrom(EmailConstants.from);
-        mail.setSubject(fournisseur.getSubject());
-        mail.setText(fournisseur.getMessage());
 
         javaMailSender.send(mail);
 
@@ -94,16 +89,10 @@ public class EmailServiceImpl implements EmailService {
     public void sendMailToClient(Client client) throws MailException  {
         StringBuilder sb = new StringBuilder();
         sb.append("Nom : " + EmailConstants.managerName).append(System.lineSeparator());
-        sb.append("\n Subject : " + client.getSubject());
-        sb.append("\n Message : " + client.getMessage());
-
         SimpleMailMessage mail = new SimpleMailMessage();
 
         mail.setTo(client.getEmail());
         mail.setFrom(EmailConstants.from);
-        mail.setSubject(client.getSubject());
-        mail.setText(client.getMessage());
-
         javaMailSender.send(mail);
     }
 }

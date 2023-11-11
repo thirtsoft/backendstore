@@ -46,10 +46,6 @@ public class Client implements Serializable {
     @Column(name = "email", length = 150, unique = true)
     private String email;
 
-    private String subject;
-
-    private String message;
-
     @Column(name = "actif")
     private int actif;
 

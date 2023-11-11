@@ -24,10 +24,6 @@ public class TypeDepense implements Serializable {
     private Long id;
 
     @NotNull
-    @Column(name = "codeCategoryCharge", length = 80, unique = true)
-    private String codeCategoryCharge;
-
-    @NotNull
     @Column(name = "designation", unique = true)
     private String designation;
 

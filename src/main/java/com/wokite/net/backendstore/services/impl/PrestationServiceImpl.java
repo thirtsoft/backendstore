@@ -4,7 +4,6 @@ import com.wokite.net.backendstore.exceptions.ResourceNotFoundException;
 import com.wokite.net.backendstore.models.Prestation;
 import com.wokite.net.backendstore.repository.PrestationRepository;
 import com.wokite.net.backendstore.services.PrestationService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,7 +16,11 @@ import java.util.Optional;
 @Transactional
 public class PrestationServiceImpl implements PrestationService {
 
-    @Autowired private PrestationRepository prestationRepository;
+    private final PrestationRepository prestationRepository;
+
+    public PrestationServiceImpl(PrestationRepository prestationRepository) {
+        this.prestationRepository = prestationRepository;
+    }
 
     @Override
     public Prestation savePrestation(Prestation prestation) {
@@ -76,6 +79,8 @@ public class PrestationServiceImpl implements PrestationService {
         if (!prestationRepository.existsById(prestId)) {
             throw new ResourceNotFoundException("Prestation that id is" + prestId + "not found");
         }
-        prestationRepository.deleteById(prestId);
+        Prestation prestation = prestationRepository.findById(prestId).get();
+        prestation.setActif(false);
+        prestationRepository.save(prestation);
     }
 }

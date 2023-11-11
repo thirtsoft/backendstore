@@ -145,8 +145,16 @@ public class ApprovisionnementServiceImpl implements ApprovisionnementService {
         Optional<Approvisionnement> approInfo = approvisionnementRepository.findById(id);
         if (approInfo.isPresent()) {
             Approvisionnement approvisionnement = approInfo.get();
+            approvisionnement.setActif(false);
+            approvisionnementRepository.save(approvisionnement);
+            List<LigneApprovisionnement> ligneApprovisionnements = approvisionnement.getLigneApprovisionnements();
+
+            /*
+            for (LigneApprovisionnement lAppro : ligneApprovisionnements) {
+
+            }*/
             ligneApprovisionnementService.deleteLApproByNumero(approvisionnement.getCode());
-            approvisionnementRepository.delete(approvisionnement);
+        //    approvisionnementRepository.delete(approvisionnement);
         }
     }
 }

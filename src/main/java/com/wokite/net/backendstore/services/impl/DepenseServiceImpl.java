@@ -4,7 +4,6 @@ import com.wokite.net.backendstore.exceptions.ResourceNotFoundException;
 import com.wokite.net.backendstore.models.Depense;
 import com.wokite.net.backendstore.repository.DepenseRepository;
 import com.wokite.net.backendstore.services.DepenseService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,8 +16,11 @@ import java.util.Optional;
 @Transactional
 public class DepenseServiceImpl implements DepenseService {
 
-    @Autowired
-    private DepenseRepository depenseRepository;
+    private final DepenseRepository depenseRepository;
+
+    public DepenseServiceImpl(DepenseRepository depenseRepository) {
+        this.depenseRepository = depenseRepository;
+    }
 
     @Override
     public Depense saveCharge(Depense depense) {
@@ -84,6 +86,8 @@ public class DepenseServiceImpl implements DepenseService {
         if (!depenseRepository.existsById(id)) {
             throw new ResourceNotFoundException("Charge not found");
         }
-        depenseRepository.deleteById(id);
+        Depense depense = depenseRepository.findById(id).get();
+        depense.setActif(false);
+        depenseRepository.save(depense);
     }
 }

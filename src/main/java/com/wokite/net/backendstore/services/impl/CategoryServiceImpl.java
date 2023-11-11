@@ -4,7 +4,6 @@ import com.wokite.net.backendstore.exceptions.ResourceNotFoundException;
 import com.wokite.net.backendstore.models.Category;
 import com.wokite.net.backendstore.repository.CategoryRepository;
 import com.wokite.net.backendstore.services.CategoryService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,8 +14,11 @@ import java.util.Optional;
 @Transactional
 public class CategoryServiceImpl implements CategoryService {
 
-    @Autowired
-    private CategoryRepository categoryRepository;
+    private final CategoryRepository categoryRepository;
+
+    public CategoryServiceImpl(CategoryRepository categoryRepository) {
+        this.categoryRepository = categoryRepository;
+    }
 
     @Override
     public Category saveCategory(Category category) {
@@ -71,6 +73,8 @@ public class CategoryServiceImpl implements CategoryService {
         if (!categoryRepository.existsById(catId)) {
             throw new ResourceNotFoundException("Category not found");
         }
-        categoryRepository.deleteById(catId);
+        Category categoryResult = categoryRepository.findById(catId).get();
+        categoryResult.setActif(false);
+        categoryRepository.save(categoryResult);
     }
 }

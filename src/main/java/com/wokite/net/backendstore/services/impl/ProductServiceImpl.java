@@ -150,6 +150,8 @@ public class ProductServiceImpl implements ProductService {
         if (!productRepository.existsById(prodId)) {
             throw new ResourceNotFoundException("Produit that id is" + prodId + "is not found");
         }
-        productRepository.deleteById(prodId);
+        Product product = productRepository.findById(prodId).get();
+        product.setActif(false);
+        productRepository.save(product);
     }
 }

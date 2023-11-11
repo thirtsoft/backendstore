@@ -21,7 +21,6 @@ public class Product implements Serializable {
     private Long id;
 
     @Column(name = "barcode", unique = true)
-//    @NotNull
     private String barCode;
 
     @Column(name = "reference", unique = true)

@@ -4,7 +4,6 @@ import com.wokite.net.backendstore.exceptions.ResourceNotFoundException;
 import com.wokite.net.backendstore.models.SubCategory;
 import com.wokite.net.backendstore.repository.SubCategoryRepository;
 import com.wokite.net.backendstore.services.SubCategoryService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,7 +14,11 @@ import java.util.Optional;
 @Transactional
 public class SubCategoryServiceImpl implements SubCategoryService {
 
-    @Autowired private SubCategoryRepository subCategoryRepository;
+    private final SubCategoryRepository subCategoryRepository;
+
+    public SubCategoryServiceImpl(SubCategoryRepository subCategoryRepository) {
+        this.subCategoryRepository = subCategoryRepository;
+    }
 
     @Override
     public SubCategory saveSubCategory(SubCategory subCategory) {
@@ -76,6 +79,8 @@ public class SubCategoryServiceImpl implements SubCategoryService {
         if (!subCategoryRepository.existsById(sCatId)) {
             throw new ResourceNotFoundException("SubCategory not found");
         }
-        subCategoryRepository.deleteById(sCatId);
+        SubCategory subCategory = subCategoryRepository.findById(sCatId).get();
+        subCategory.setActif(false);
+        subCategoryRepository.save(subCategory);
     }
 }

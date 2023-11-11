@@ -4,7 +4,6 @@ import com.wokite.net.backendstore.exceptions.ResourceNotFoundException;
 import com.wokite.net.backendstore.models.Employe;
 import com.wokite.net.backendstore.repository.EmployeRepository;
 import com.wokite.net.backendstore.services.EmployeService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,8 +14,11 @@ import java.util.Optional;
 @Transactional
 public class EmployeServiceImpl implements EmployeService {
 
-    @Autowired
-    private EmployeRepository employeRepository;
+    private final EmployeRepository employeRepository;
+
+    public EmployeServiceImpl(EmployeRepository employeRepository) {
+        this.employeRepository = employeRepository;
+    }
 
     @Override
     public Employe saveEmploye(Employe employe) {
@@ -77,6 +79,8 @@ public class EmployeServiceImpl implements EmployeService {
         if (!employeRepository.existsById(empId)) {
             throw new ResourceNotFoundException("Employe N° " + empId + "not found");
         }
-        employeRepository.deleteById(empId);
+        Employe employe = employeRepository.findById(empId).get();
+        employe.setActif(false);
+        employeRepository.save(employe);
     }
 }
