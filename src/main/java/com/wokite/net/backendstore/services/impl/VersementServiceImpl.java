@@ -27,6 +27,7 @@ public class VersementServiceImpl implements VersementService {
             throw new ResourceNotFoundException("Versement exist");
         }
         versement.setDateVersement(new Date());
+        versement.setActif(true);
         return versementRepository.save(versement);
     }
 
@@ -39,16 +40,13 @@ public class VersementServiceImpl implements VersementService {
         if (!optionalVersement.isPresent()) {
             throw new ResourceNotFoundException("Versment Not found");
         }
-
         Versement versementResult = optionalVersement.get();
-
         versementResult.setNumVersement(versement.getNumVersement());
         versementResult.setNumeroRecu(versement.getNumeroRecu());
         versementResult.setMontantVersement(versement.getMontantVersement());
         versementResult.setMotif(versement.getMotif());
         versementResult.setDateVersement(versement.getDateVersement());
         versementResult.setEmploye(versement.getEmploye());
-
         return versementRepository.save(versementResult);
     }
 

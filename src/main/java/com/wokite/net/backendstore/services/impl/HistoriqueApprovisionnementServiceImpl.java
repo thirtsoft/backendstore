@@ -8,7 +8,6 @@ import com.wokite.net.backendstore.repository.HistoriqueApprovisionnementReposit
 import com.wokite.net.backendstore.services.ApprovisionnementService;
 import com.wokite.net.backendstore.services.HistoriqueApprovisionnementService;
 import com.wokite.net.backendstore.services.UtilisateurService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,13 +20,19 @@ import java.util.Optional;
 @Transactional
 public class HistoriqueApprovisionnementServiceImpl implements HistoriqueApprovisionnementService {
 
-    @Autowired private HistoriqueApprovisionnementRepository historiqueApprovisionnementRepository;
+    private final HistoriqueApprovisionnementRepository historiqueApprovisionnementRepository;
 
-    @Autowired
-    private UtilisateurService utilisateurService;
+    private final UtilisateurService utilisateurService;
 
-    @Autowired
-    private ApprovisionnementService approvisionnementService;
+    private final ApprovisionnementService approvisionnementService;
+
+    public HistoriqueApprovisionnementServiceImpl(HistoriqueApprovisionnementRepository historiqueApprovisionnementRepository,
+                                                  UtilisateurService utilisateurService,
+                                                  ApprovisionnementService approvisionnementService) {
+        this.historiqueApprovisionnementRepository = historiqueApprovisionnementRepository;
+        this.utilisateurService = utilisateurService;
+        this.approvisionnementService = approvisionnementService;
+    }
 
     @Override
     public HistoriqueApprovisionnement saveHistoriqueApprovisionnement(HistoriqueApprovisionnement historiqueApprovisionnement) {
@@ -78,6 +83,9 @@ public class HistoriqueApprovisionnementServiceImpl implements HistoriqueApprovi
         if (!historiqueApprovisionnementRepository.existsById(id)) {
             throw new ResourceNotFoundException("HistoriqueApprovisionnement is not found");
         }
-        historiqueApprovisionnementRepository.deleteById(id);
+        HistoriqueApprovisionnement historiqueApprovisionnement = historiqueApprovisionnementRepository
+                .findById(id).get();
+        historiqueApprovisionnement.setActif(false);
+        historiqueApprovisionnementRepository.save(historiqueApprovisionnement);
     }
 }

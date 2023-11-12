@@ -23,7 +23,6 @@ public class HistoriqueLoginServiceImpl implements HistoriqueLoginService {
 
     private final UtilisateurService utilisateurService;
 
-    @Autowired
     public HistoriqueLoginServiceImpl(HistoriqueLoginRepository historiqueLoginRepository,
                                       UtilisateurService utilisateurService) {
         this.historiqueLoginRepository = historiqueLoginRepository;
@@ -75,7 +74,9 @@ public class HistoriqueLoginServiceImpl implements HistoriqueLoginService {
         if (!historiqueLoginRepository.existsById(id)) {
             throw new ResourceNotFoundException("HistoriqueLogin that id is" + id + "not found");
         }
-        historiqueLoginRepository.deleteById(id);
+        HistoriqueLogin historiqueLogin = historiqueLoginRepository.findById(id).get();
+        historiqueLogin.setActif(false);
+        historiqueLoginRepository.save(historiqueLogin);
     }
 
 }

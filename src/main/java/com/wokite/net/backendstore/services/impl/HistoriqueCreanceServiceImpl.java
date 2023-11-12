@@ -27,7 +27,6 @@ public class HistoriqueCreanceServiceImpl implements HistoriqueCreanceService {
 
     private final CreanceService creanceService;
 
-    @Autowired
     public HistoriqueCreanceServiceImpl(HistoriqueCreanceRepository historiqueCreanceRepository,
                                         UtilisateurService utilisateurService, CreanceService creanceService) {
         this.historiqueCreanceRepository = historiqueCreanceRepository;
@@ -84,7 +83,10 @@ public class HistoriqueCreanceServiceImpl implements HistoriqueCreanceService {
         if (!historiqueCreanceRepository.existsById(id)) {
             throw new ResourceNotFoundException("HistoriqueCreance that id is" + id + "not found");
         }
-        historiqueCreanceRepository.deleteById(id);
+        HistoriqueCreance historiqueCreance = historiqueCreanceRepository
+                .findById(id).get();
+        historiqueCreance.setActif(false);
+        historiqueCreanceRepository.save(historiqueCreance);
     }
 
 }

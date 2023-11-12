@@ -8,7 +8,6 @@ import com.wokite.net.backendstore.repository.HistoriqueAvoirRepository;
 import com.wokite.net.backendstore.services.AvoirService;
 import com.wokite.net.backendstore.services.HistoriqueAvoirService;
 import com.wokite.net.backendstore.services.UtilisateurService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,11 +20,19 @@ import java.util.Optional;
 @Transactional
 public class HistoriqueAvoirServiceImpl implements HistoriqueAvoirService {
 
-    @Autowired private HistoriqueAvoirRepository historiqueAvoirRepository;
+    private final HistoriqueAvoirRepository historiqueAvoirRepository;
 
-    @Autowired private UtilisateurService utilisateurService;
+    private final UtilisateurService utilisateurService;
 
-    @Autowired private AvoirService avoirService;
+    private final AvoirService avoirService;
+
+    public HistoriqueAvoirServiceImpl(HistoriqueAvoirRepository historiqueAvoirRepository,
+                                      UtilisateurService utilisateurService,
+                                      AvoirService avoirService) {
+        this.historiqueAvoirRepository = historiqueAvoirRepository;
+        this.utilisateurService = utilisateurService;
+        this.avoirService = avoirService;
+    }
 
     @Override
     public HistoriqueAvoir saveHistoriqueAvoir(HistoriqueAvoir historiqueAvoir) {
@@ -76,6 +83,9 @@ public class HistoriqueAvoirServiceImpl implements HistoriqueAvoirService {
         if (!historiqueAvoirRepository.existsById(id)) {
             throw new ResourceNotFoundException("Historique " + id + "not found");
         }
-        historiqueAvoirRepository.findById(id);
+        HistoriqueAvoir historiqueAvoir = historiqueAvoirRepository
+                .findById(id).get();
+        historiqueAvoir.setActif(false);
+        historiqueAvoirRepository.save(historiqueAvoir);
     }
 }

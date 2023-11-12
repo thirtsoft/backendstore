@@ -4,7 +4,6 @@ import com.wokite.net.backendstore.exceptions.ResourceNotFoundException;
 import com.wokite.net.backendstore.models.Stock;
 import com.wokite.net.backendstore.repository.StockRepository;
 import com.wokite.net.backendstore.services.StockService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,9 +12,11 @@ import java.util.Optional;
 @Service
 public class StockServiceImpl implements StockService {
 
-    @Autowired
-    private StockRepository stockRepository;
+    private final StockRepository stockRepository;
 
+    public StockServiceImpl(StockRepository stockRepository) {
+        this.stockRepository = stockRepository;
+    }
 
     @Override
     public Stock saveStock(Stock stock) {

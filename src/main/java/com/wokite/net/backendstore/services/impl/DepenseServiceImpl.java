@@ -24,11 +24,8 @@ public class DepenseServiceImpl implements DepenseService {
 
     @Override
     public Depense saveCharge(Depense depense) {
-        String codeCharge = String.valueOf(depenseRepository.findByCodeCharge(depense.getCodeCharge()));
-        if (codeCharge == depense.getCodeCharge()) {
-            throw new IllegalArgumentException("Charge exist");
-        }
         depense.setDateCharge(new Date());
+        depense.setActif(true);
         return depenseRepository.save(depense);
     }
 
@@ -41,9 +38,7 @@ public class DepenseServiceImpl implements DepenseService {
         if (!optionalCharge.isPresent()) {
             throw new ResourceNotFoundException("Charge not found");
         }
-
         Depense depenseResult = optionalCharge.get();
-        depenseResult.setCodeCharge(depense.getCodeCharge());
         depenseResult.setDesignation(depense.getDesignation());
         depenseResult.setTypeDepense(depense.getTypeDepense());
         depenseResult.setMontantCharge(depense.getMontantCharge());

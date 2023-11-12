@@ -22,6 +22,7 @@ public class TypeDepenseServiceImpl implements TypeDepenseService {
 
     @Override
     public TypeDepense saveCategoryCharge(TypeDepense typeDepense) {
+        typeDepense.setActif(true);
         return typeDepenseRepository.save(typeDepense);
     }
 

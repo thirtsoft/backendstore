@@ -5,15 +5,12 @@ import com.wokite.net.backendstore.exceptions.ResourceNotFoundException;
 import com.wokite.net.backendstore.models.Contrat;
 import com.wokite.net.backendstore.repository.ContratRepository;
 import com.wokite.net.backendstore.services.ContratService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -25,10 +22,15 @@ public class ContratServiceImpl implements ContratService {
 
     private final Path fileStorageLocation = Paths.get("C:\\Folio9470m\\AlAmine\\Contrat");
 
-    @Autowired private ContratRepository contratRepository;
+    private final ContratRepository contratRepository;
+
+    public ContratServiceImpl(ContratRepository contratRepository) {
+        this.contratRepository = contratRepository;
+    }
 
     @Override
     public Contrat saveContrat(Contrat contrat) {
+        contrat.setActif(true);
         return contratRepository.save(contrat);
     }
 
@@ -79,6 +81,7 @@ public class ContratServiceImpl implements ContratService {
     public Contrat createContrat(String contrat, MultipartFile fileContrant) throws IOException {
         Contrat contratResult = new ObjectMapper().readValue(contrat, Contrat.class);
         contratResult.setFileContrat(fileContrant.getOriginalFilename());
+        contratResult.setActif(true);
         return contratRepository.save(contratResult);
     }
 
@@ -92,6 +95,8 @@ public class ContratServiceImpl implements ContratService {
         if (!contratRepository.existsById(id)) {
             throw new ResourceNotFoundException("Contrat not found");
         }
-        contratRepository.deleteById(id);
+        Contrat contrat = contratRepository.findById(id).get();
+        contrat.setActif(false);
+        contratRepository.save(contrat);
     }
 }

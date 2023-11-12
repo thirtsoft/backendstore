@@ -23,7 +23,6 @@ public class LigneCommande implements Serializable {
     private Long id;
 
     @NotNull
-   // @Column(name = "numero", length = 100, unique = true)
     @Column(name = "numero", length = 100)
     private Long numero;
 
@@ -46,6 +45,9 @@ public class LigneCommande implements Serializable {
     @JoinColumn(name = "prod_id")
     private Product product;
 
+    @Column(name = "actif")
+    private int actif;
+
     public LigneCommande(Long numero, int quantite, Double prix, Double prixCommande, Product product) {
         this.numero = numero;
         this.quantite = quantite;
@@ -53,4 +55,19 @@ public class LigneCommande implements Serializable {
         this.prixCommande = prixCommande;
         this.product = product;
     }
+
+    public void setActif(boolean actif) {
+        if (actif)
+            this.actif = 1;
+        else
+            this.actif = 0;
+    }
+
+    public boolean isActif() {
+        if (actif == 1)
+            return true;
+        return false;
+    }
+
+
 }

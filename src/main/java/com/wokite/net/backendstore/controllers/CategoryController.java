@@ -55,8 +55,7 @@ public class CategoryController implements CategoryApi {
 
     @Override
     public ResponseEntity<Category> updateCategory(Long catId, Category category) {
-        category.setId(catId);
-        Category categoryResult = categoryService.saveCategory(category);
+        Category categoryResult = categoryService.updateCategory(catId, category);
         return new ResponseEntity<>(categoryResult, HttpStatus.OK);
     }
 

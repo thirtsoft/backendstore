@@ -19,7 +19,6 @@ public class LigneVente implements Serializable {
     private Long id;
 
     @NotNull
-   // @Column(name = "numeroVente", length = 100, unique = true)
     @Column(name = "numeroVente", length = 100)
     private Long numeroVente;
 
@@ -42,6 +41,22 @@ public class LigneVente implements Serializable {
     @ManyToOne
     @JoinColumn(name = "prod_id")
     private Product product;
+
+    @Column(name = "actif")
+    private int actif;
+
+    public void setActif(boolean actif) {
+        if (actif)
+            this.actif = 1;
+        else
+            this.actif = 0;
+    }
+
+    public boolean isActif() {
+        if (actif == 1)
+            return true;
+        return false;
+    }
 
     public Long getId() {
         return id;

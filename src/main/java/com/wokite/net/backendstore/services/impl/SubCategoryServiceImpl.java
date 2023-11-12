@@ -22,6 +22,7 @@ public class SubCategoryServiceImpl implements SubCategoryService {
 
     @Override
     public SubCategory saveSubCategory(SubCategory subCategory) {
+        subCategory.setActif(true);
         return subCategoryRepository.save(subCategory);
     }
 
@@ -31,18 +32,14 @@ public class SubCategoryServiceImpl implements SubCategoryService {
             throw new ResourceNotFoundException("SubCategory Not found");
         }
         Optional<SubCategory> optionalSubCategory = subCategoryRepository.findById(sCatId);
-
         if (!optionalSubCategory.isPresent()) {
             throw new ResourceNotFoundException("Scategorie Not found");
         }
-
         SubCategory subCategoryResult = optionalSubCategory.get();
         subCategoryResult.setCode(subCategory.getCode());
         subCategoryResult.setLibelle(subCategory.getLibelle());
         subCategoryResult.setCategory(subCategory.getCategory());
-
         return subCategoryRepository.save(subCategoryResult);
-
     }
 
     @Override

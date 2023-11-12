@@ -27,7 +27,6 @@ public class HistoriqueVenteServiceImpl implements HistoriqueVenteService {
 
     private final VenteService venteService;
 
-    @Autowired
     public HistoriqueVenteServiceImpl(HistoriqueVenteRepository historiqueVenteRepository,
                                       UtilisateurService utilisateurService, VenteService venteService) {
         this.historiqueVenteRepository = historiqueVenteRepository;
@@ -86,6 +85,8 @@ public class HistoriqueVenteServiceImpl implements HistoriqueVenteService {
             throw new ResourceNotFoundException("HistoriqueVente that id is" + id + "not found");
 
         }
-        historiqueVenteRepository.deleteById(id);
+        HistoriqueVente historiqueVente = historiqueVenteRepository.findById(id).get();
+        historiqueVente.setActif(false);
+        historiqueVenteRepository.save(historiqueVente);
     }
 }

@@ -22,6 +22,7 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public Client saveClient(Client client) {
+        client.setActif(true);
         return clientRepository.save(client);
     }
 

@@ -27,7 +27,6 @@ public class HistoriqueCommandeServiceImpl implements HistoriqueCommandeService 
 
     private final CommandeService commandeService;
 
-    @Autowired
     public HistoriqueCommandeServiceImpl(HistoriqueCommandeRepository historiqueCommandeRepository,
                                          UtilisateurService utilisateurService,
                                          CommandeService commandeService) {
@@ -85,7 +84,10 @@ public class HistoriqueCommandeServiceImpl implements HistoriqueCommandeService 
         if (!historiqueCommandeRepository.existsById(id)) {
             throw new ResourceNotFoundException("HistoriqueCommande that id is" + id + "not found");
         }
-        historiqueCommandeRepository.deleteById(id);
+        HistoriqueCommande historiqueCommande = historiqueCommandeRepository
+                .findById(id).get();
+        historiqueCommande.setActif(false);
+        historiqueCommandeRepository.save(historiqueCommande);
     }
 
 }

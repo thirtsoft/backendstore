@@ -1,16 +1,14 @@
 package com.wokite.net.backendstore.services.impl;
 
 import com.wokite.net.backendstore.exceptions.ResourceNotFoundException;
-import com.wokite.net.backendstore.models.Creance;
-import com.wokite.net.backendstore.models.LigneCreance;
-import com.wokite.net.backendstore.models.Product;
+import com.wokite.net.backendstore.models.*;
 import com.wokite.net.backendstore.repository.CreanceRepository;
+import com.wokite.net.backendstore.repository.LigneCreanceRepository;
 import com.wokite.net.backendstore.services.CreanceService;
 import com.wokite.net.backendstore.services.LigneCreanceService;
 import com.wokite.net.backendstore.services.ProductService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,20 +23,27 @@ public class CreanceServiceImpl implements CreanceService {
 
     Logger logger = LoggerFactory.getLogger(CreanceServiceImpl.class);
 
-    @Autowired
-    private CreanceRepository creanceRepository;
+    private final CreanceRepository creanceRepository;
 
+    private final LigneCreanceService ligneCreanceService;
 
-    @Autowired
-    private LigneCreanceService ligneCreanceService;
+    private final LigneCreanceRepository ligneCreanceRepository;
 
-    @Autowired
-    private ProductService productService;
+    private final ProductService productService;
+
+    public CreanceServiceImpl(CreanceRepository creanceRepository,
+                              LigneCreanceService ligneCreanceService,
+                              LigneCreanceRepository ligneCreanceRepository,
+                              ProductService productService) {
+        this.creanceRepository = creanceRepository;
+        this.ligneCreanceService = ligneCreanceService;
+        this.ligneCreanceRepository = ligneCreanceRepository;
+        this.productService = productService;
+    }
 
     @Override
     public Creance saveCreance(Creance creance) {
         logger.info("Creance {}", creance);
-
         List<LigneCreance> ligneCreanceList = creance.getLcreances();
 
         if (ligneCreanceList == null || ligneCreanceList.size() == 0) {
@@ -57,7 +62,6 @@ public class CreanceServiceImpl implements CreanceService {
         }
 
         creanceRepository.save(creance);
-
         List<LigneCreance> ligneCreanceListResult = creance.getLcreances();
 
         double total = 0;
@@ -65,10 +69,9 @@ public class CreanceServiceImpl implements CreanceService {
 
         for (LigneCreance ligneCreance : ligneCreanceListResult) {
             ligneCreance.setCreance(creance);
+            ligneCreance.setActif(true);
             ligneCreance.setNumeroLigneCreance(creance.getReference());
-
             ligneCreanceService.saveLigneCreance(ligneCreance);
-
             Product product = productService.findProductById(ligneCreance.getProduct().getId()).get();
             if (product != null) {
                 product.setQtestock(product.getQtestock() - ligneCreance.getQuantite());
@@ -76,16 +79,14 @@ public class CreanceServiceImpl implements CreanceService {
             }
 
             ligneCreance.setPrix(product.getPrixVente());
-
             total += (ligneCreance.getQuantite() * product.getPrixVente());
         }
 
         total1 = total + creance.getSoldeCreance();
-
         creance.setTotalCreance(total1);
         creance.setStatus("ENCOURS");
         creance.setDateCreance(new Date());
-
+        creance.setActif(true);
         return creanceRepository.save(creance);
 
     }
@@ -95,24 +96,18 @@ public class CreanceServiceImpl implements CreanceService {
         if (!creanceRepository.existsById(creanceId)) {
             throw new ResourceNotFoundException("Creance that id is" + creanceId + "not found");
         }
-
         Optional<Creance> optionalCreance = creanceRepository.findById(creanceId);
-
         if (!optionalCreance.isPresent()) {
             throw new ResourceNotFoundException("Creance that id is" + creanceId + "not found");
         }
-
         Creance creanceResult = optionalCreance.get();
-
         creanceResult.setReference(creance.getReference());
         creanceResult.setLibelle(creance.getLibelle());
         creanceResult.setClient(creance.getClient());
         creanceResult.setSoldeCreance(creance.getSoldeCreance());
         creanceResult.setNbreJours(creance.getNbreJours());
-
         creanceResult.setTotalCreance(creance.getTotalCreance());
         creanceResult.setStatus(creance.getStatus());
-
         return creanceRepository.save(creanceResult);
     }
 
@@ -120,7 +115,6 @@ public class CreanceServiceImpl implements CreanceService {
     public void updateCreanceStatus(Long id, String status) {
         Creance creance = this.creanceRepository.findById(id).get();
         creance.setStatus(creance.getStatus());
-
         creanceRepository.updateCreanceStatus(status, id);
     }
 
@@ -233,6 +227,16 @@ public class CreanceServiceImpl implements CreanceService {
 
     @Override
     public void deleteCreance(Long id) {
-
+        Optional<Creance> creanceInfo = creanceRepository.findById(id);
+        if (creanceInfo.isPresent()) {
+            Creance creance = creanceInfo.get();
+            List<LigneCreance> ligneCreanceList = creance.getLcreances();
+            for (LigneCreance ligneCreance: ligneCreanceList) {
+                ligneCreance.setActif(false);
+                ligneCreanceRepository.save(ligneCreance);
+            }
+            creance.setActif(false);
+            creanceRepository.save(creance);
+        }
     }
 }

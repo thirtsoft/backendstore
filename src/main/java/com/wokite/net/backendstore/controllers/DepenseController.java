@@ -37,13 +37,7 @@ public class DepenseController implements DepenseApi {
 
     @Override
     public ResponseEntity<Depense> createCharge(Depense depense) {
-        if (depense.getCodeCharge() != null) {
-            return new ResponseEntity<>(depense, HttpStatus.BAD_REQUEST);
-        }
-        Depense depenseResultant;
-        String ch = "DEP#_" + Math.random() * 10;
-        depense.setCodeCharge(ch);
-        depenseResultant = depenseService.saveCharge(depense);
+        Depense depenseResultant = depenseService.saveCharge(depense);
 
         /*
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

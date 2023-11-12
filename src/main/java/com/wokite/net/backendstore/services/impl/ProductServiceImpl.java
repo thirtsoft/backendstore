@@ -28,6 +28,7 @@ public class ProductServiceImpl implements ProductService {
         if (productinfo == product.getBarCode()) {
             throw new IllegalArgumentException("Cet Article existe déjà");
         }
+        product.setActif(true);
         return productRepository.save(product);
     }
 
@@ -35,8 +36,8 @@ public class ProductServiceImpl implements ProductService {
     public Product saveProductWithBarcode(Product product) throws Exception {
         Product productResult = new Product();
         if (product.getBarCode() != null) {
+            product.setActif(true);
             productResult = productRepository.save(product);
-
         } else {
             //      String productBarCodeResult = ZxingBarcodeHelper.generatedBarCodeWithProduct(product);
             //     productResult.setBarCode(GeneratedNumber.generateCodeCommand());
@@ -48,10 +49,9 @@ public class ProductServiceImpl implements ProductService {
             productResult.setQtestock(product.getQtestock());
             productResult.setStockInitial(product.getStockInitial());
             productResult.setSubCategory(product.getSubCategory());
-
+            productResult.setActif(true);
             productRepository.save(productResult);
         }
-
         return productResult;
     }
 
@@ -67,7 +67,6 @@ public class ProductServiceImpl implements ProductService {
 
         }
         Product productResult = optionalProduct.get();
-
         productResult.setReference(product.getReference());
         productResult.setBarCode(product.getBarCode());
         productResult.setDesignation(product.getDesignation());
@@ -77,7 +76,6 @@ public class ProductServiceImpl implements ProductService {
         productResult.setQtestock(product.getQtestock());
         productResult.setStockInitial(product.getStockInitial());
         productResult.setSubCategory(product.getSubCategory());
-
         return productRepository.save(productResult);
     }
 

@@ -24,10 +24,6 @@ public class Depense implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull
-    @Column(name = "codeCharge", length = 100, unique = true)
-    private String codeCharge;
-
     @Column(name = "montantCharge", length = 150)
     private Double montantCharge;
 
@@ -58,7 +54,5 @@ public class Depense implements Serializable {
             return true;
         return false;
     }
-
-
 
 }

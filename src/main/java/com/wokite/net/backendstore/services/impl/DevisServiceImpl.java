@@ -5,12 +5,12 @@ import com.wokite.net.backendstore.models.Devis;
 import com.wokite.net.backendstore.models.LigneDevis;
 import com.wokite.net.backendstore.models.Product;
 import com.wokite.net.backendstore.repository.DevisRepository;
+import com.wokite.net.backendstore.repository.LigneDevisRepository;
 import com.wokite.net.backendstore.services.DevisService;
 import com.wokite.net.backendstore.services.LigneDevisService;
 import com.wokite.net.backendstore.services.ProductService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,14 +25,23 @@ public class DevisServiceImpl implements DevisService {
 
     Logger logger = LoggerFactory.getLogger(DevisServiceImpl.class);
 
-    @Autowired
-    private DevisRepository devisRepository;
+    private final DevisRepository devisRepository;
 
-    @Autowired
-    private LigneDevisService ligneDevisService;
+    private final LigneDevisService ligneDevisService;
 
-    @Autowired
-    private ProductService productService;
+    private final LigneDevisRepository ligneDevisRepository;
+
+    private final ProductService productService;
+
+    public DevisServiceImpl(DevisRepository devisRepository,
+                            LigneDevisService ligneDevisService,
+                            LigneDevisRepository ligneDevisRepository,
+                            ProductService productService) {
+        this.devisRepository = devisRepository;
+        this.ligneDevisService = ligneDevisService;
+        this.ligneDevisRepository = ligneDevisRepository;
+        this.productService = productService;
+    }
 
     @Override
     public Devis saveDevis(Devis devis) {
@@ -44,37 +53,29 @@ public class DevisServiceImpl implements DevisService {
         if ((devis.getClient().getId() == null)) {
             throw new IllegalArgumentException("Vous devez selectionner un client");
         }
-
         for (LigneDevis ligneDevis : ligneDevisList) {
             Product productInitial = productService.findProductById(ligneDevis.getProduct().getId()).get();
             if (ligneDevis.getQuantite() > productInitial.getQtestock()) {
                 throw new IllegalArgumentException("La Quantité de stock du article est insuffusante");
             }
         }
-
         devisRepository.save(devis);
-
         List<LigneDevis> ligneDevisListClients = devis.getLdevis();
         double total = 0;
         for (LigneDevis ligneDevis : ligneDevisListClients) {
             ligneDevis.setDevis(devis);
             ligneDevis.setNumeroligneDevis(devis.getNumeroDevis());
+            ligneDevis.setActif(true);
             ligneDevisService.saveLigneDevis(ligneDevis);
-
             Product product= productService.findProductById(ligneDevis.getProduct().getId()).get();
-
             ligneDevis.setPrix(product.getPrixVente());
-
             total += (ligneDevis.getQuantite() * ligneDevis.getPrixligneDevis());
-
         }
-
         devis.setTotalDevis(total);
         devis.setStatus("valider");
         devis.setDateDevis(new Date());
-
+        devis.setActif(true);
         return devisRepository.save(devis);
-
     }
 
     @Override
@@ -82,21 +83,16 @@ public class DevisServiceImpl implements DevisService {
         if (!devisRepository.existsById(devId)) {
             throw new ResourceNotFoundException("Devis not found");
         }
-
         Optional<Devis> devisClient = devisRepository.findById(devId);
-
         if (!devisClient.isPresent()) {
             throw new ResourceNotFoundException("Devis not found");
         }
-
         Devis devisResult = devisClient.get();
-
         devisResult.setNumeroDevis(devis.getNumeroDevis());
         devisResult.setDateDevis(devis.getDateDevis());
         devisResult.setClient(devis.getClient());
         devisResult.setTotalDevis(devis.getTotalDevis());
         devisResult.setStatus(devis.getStatus());
-
         return devisRepository.save(devisResult);
     }
 
@@ -158,8 +154,13 @@ public class DevisServiceImpl implements DevisService {
         Optional<Devis> devisInfo = devisRepository.findById(id);
         if (devisInfo.isPresent()) {
             Devis devis = devisInfo.get();
-            ligneDevisService.deleteLigneDevisByNumero(devis.getNumeroDevis());
-            devisRepository.delete(devis);
+            List<LigneDevis> ligneDevisList = devis.getLdevis();
+            for (LigneDevis ligneDevis: ligneDevisList) {
+                ligneDevis.setActif(false);
+                ligneDevisRepository.save(ligneDevis);
+            }
+            devis.setActif(false);
+            devisRepository.save(devis);
         }
     }
 }

@@ -4,11 +4,11 @@ import com.wokite.net.backendstore.exceptions.ResourceNotFoundException;
 import com.wokite.net.backendstore.models.LigneVente;
 import com.wokite.net.backendstore.models.Product;
 import com.wokite.net.backendstore.models.Vente;
+import com.wokite.net.backendstore.repository.LigneVenteRepository;
 import com.wokite.net.backendstore.repository.VenteRepository;
 import com.wokite.net.backendstore.services.LigneVenteService;
 import com.wokite.net.backendstore.services.ProductService;
 import com.wokite.net.backendstore.services.VenteService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,114 +22,93 @@ import java.util.Optional;
 @Transactional
 public class VenteServiceImpl implements VenteService {
 
-    @Autowired private VenteRepository venteRepository;
+    private final VenteRepository venteRepository;
 
-    @Autowired private LigneVenteService ligneVenteService;
+    private final LigneVenteService ligneVenteService;
 
-    @Autowired private ProductService productService;
+    private final LigneVenteRepository ligneVenteRepository;
+
+    private final ProductService productService;
+
+    public VenteServiceImpl(VenteRepository venteRepository,
+                            LigneVenteService ligneVenteService,
+                            LigneVenteRepository ligneVenteRepository,
+                            ProductService productService) {
+        this.venteRepository = venteRepository;
+        this.ligneVenteService = ligneVenteService;
+        this.ligneVenteRepository = ligneVenteRepository;
+        this.productService = productService;
+    }
 
 
     @Override
     public Vente saveVente(Vente vente) {
         System.out.println("Initial Numero Vente " + vente.getNumeroVente());
-
         List<LigneVente> ligneVenteList = vente.getLigneVentes();
-
         if (ligneVenteList == null || ligneVenteList.size() == 0) {
             throw new IllegalArgumentException("Vous devez au moins ajouter un produit");
         }
-
         for (LigneVente ligneVente : ligneVenteList) {
             Product produitInitial = productService.findProductById(ligneVente.getProduct().getId()).get();
             if (ligneVente.getQuantite() > produitInitial.getQtestock()) {
                 throw new IllegalArgumentException("La Quantité de stock du produit est insuffusante");
             }
         }
-
         venteRepository.save(vente);
-
         List<LigneVente> ligneVenteListProducts = vente.getLigneVentes();
-
         double total = 0;
-
         for (LigneVente ligneVente : ligneVenteListProducts) {
             ligneVente.setVente(vente);
             ligneVente.setNumeroVente(vente.getNumeroVente());
-
+            ligneVente.setActif(true);
             ligneVenteService.saveLigneVente(ligneVente);
-
             Product product = productService.findProductById(ligneVente.getProduct().getId()).get();
-
             if (product != null) {
                 product.setQtestock(product.getQtestock() - ligneVente.getQuantite());
                 productService.updateProduct(product.getId(), product);
             }
-
             ligneVente.setPrixVente(product.getPrixDetail());
-
             total += (ligneVente.getQuantite() * product.getPrixDetail());
-
         }
-
         vente.setTotalVente(total);
         vente.setStatus("VALIDEE");
         vente.setDateVente(new Date());
         vente.setUtilisateur(vente.getUtilisateur());
-
         System.out.println("Fin Numero Vente " + vente.getNumeroVente());
-
+        vente.setActif(true);
         return venteRepository.save(vente);
-
     }
 
     @Override
     public Vente saveVenteWithBarcode(Vente vente) {
-        System.out.println("Initial Vente " + vente);
-
-        System.out.println("Initial Numero Vente " + vente.getNumeroVente());
-
         List<LigneVente> ligneVenteList = vente.getLigneVentes();
-
         if (ligneVenteList == null || ligneVenteList.size() == 0) {
             throw new IllegalArgumentException("Vous devez au moins ajouter un produit");
         }
-
         venteRepository.save(vente);
-
         System.out.println("Milieu Numero Vente " + vente.getNumeroVente());
-
         List<LigneVente> ligneVenteListResult = vente.getLigneVentes();
-
         double total = 0;
-
         for (LigneVente ligneVente : ligneVenteListResult) {
             ligneVente.setVente(vente);
             ligneVente.setNumeroVente(vente.getNumeroVente());
-
+            ligneVente.setActif(true);
             ligneVenteService.saveLigneVente(ligneVente);
-
             Product product = productService.findProductById(ligneVente.getProduct().getId()).get();
-
             if (product != null) {
                 product.setQtestock(product.getQtestock() - ligneVente.getQuantite());
                 productService.updateProduct(product.getId(), product);
             }
-
             ligneVente.setPrixVente(product.getPrixDetail());
-
             total += (ligneVente.getQuantite() * product.getPrixDetail());
-
         }
 
         vente.setTotalVente(total);
         vente.setStatus("valider");
         vente.setDateVente(new Date());
         vente.setUtilisateur(vente.getUtilisateur());
-
-        System.out.println("Fin Numero Vente " + vente.getNumeroVente());
-
+        vente.setActif(true);
         return venteRepository.save(vente);
-
     }
 
     @Override
@@ -142,11 +121,9 @@ public class VenteServiceImpl implements VenteService {
             throw new ResourceNotFoundException("Vente N ° " + venteId + "not found");
         }
         Vente venteResultat = venteProd.get();
-
         venteResultat.setNumeroVente(vente.getNumeroVente());
         venteResultat.setTotalVente(vente.getTotalVente());
         venteResultat.setDateVente(new Date());
-
         return venteRepository.save(venteResultat);
     }
 
@@ -263,8 +240,13 @@ public class VenteServiceImpl implements VenteService {
         Optional<Vente> venteInfo = venteRepository.findById(id);
         if (venteInfo.isPresent()) {
             Vente vente = venteInfo.get();
-            ligneVenteService.deleteLventeByNumero(vente.getNumeroVente());
-            venteRepository.delete(vente);
+            List<LigneVente> ligneVenteList = vente.getLigneVentes();
+            for (LigneVente ligneVente : ligneVenteList) {
+                ligneVente.setActif(false);
+                ligneVenteRepository.save(ligneVente);
+            }
+            vente.setActif(false);
+            venteRepository.save(vente);
         }
     }
 }

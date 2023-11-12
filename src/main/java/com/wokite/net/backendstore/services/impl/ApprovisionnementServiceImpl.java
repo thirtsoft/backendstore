@@ -5,10 +5,10 @@ import com.wokite.net.backendstore.models.Approvisionnement;
 import com.wokite.net.backendstore.models.LigneApprovisionnement;
 import com.wokite.net.backendstore.models.Product;
 import com.wokite.net.backendstore.repository.ApprovisionnementRepository;
+import com.wokite.net.backendstore.repository.LigneApprovisionnementRepository;
 import com.wokite.net.backendstore.services.ApprovisionnementService;
 import com.wokite.net.backendstore.services.LigneApprovisionnementService;
 import com.wokite.net.backendstore.services.ProductService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,11 +20,23 @@ import java.util.Optional;
 @Transactional
 public class ApprovisionnementServiceImpl implements ApprovisionnementService {
 
-    @Autowired private ApprovisionnementRepository approvisionnementRepository;
+    private final ApprovisionnementRepository approvisionnementRepository;
 
-    @Autowired private LigneApprovisionnementService ligneApprovisionnementService;
+    private final LigneApprovisionnementService ligneApprovisionnementService;
 
-    @Autowired private ProductService productService;
+    private final LigneApprovisionnementRepository ligneApprovisionnementRepository;
+
+    private final ProductService productService;
+
+    public ApprovisionnementServiceImpl(ApprovisionnementRepository approvisionnementRepository,
+                                        LigneApprovisionnementService ligneApprovisionnementService,
+                                        LigneApprovisionnementRepository ligneApprovisionnementRepository,
+                                        ProductService productService) {
+        this.approvisionnementRepository = approvisionnementRepository;
+        this.ligneApprovisionnementService = ligneApprovisionnementService;
+        this.ligneApprovisionnementRepository = ligneApprovisionnementRepository;
+        this.productService = productService;
+    }
 
     @Override
     public Approvisionnement saveApprovisionnement(Approvisionnement approvisionnement) {
@@ -52,17 +64,15 @@ public class ApprovisionnementServiceImpl implements ApprovisionnementService {
                 product.setQtestock(product.getQtestock() + lAppro.getQuantite());
                 productService.updateProduct(product.getId(), product);
             }
-
+            lAppro.setActif(true);
             lAppro.setPrix(product.getPrixAchat());
-
             total += (lAppro.getQuantite() * lAppro.getPrixLigneAppro());
-
         }
 
         approvisionnement.setTotalAppro(total);
         approvisionnement.setStatus("ENCOURS");
         approvisionnement.setDateApprovisionnement(new Date());
-
+        approvisionnement.setActif(true);
         return approvisionnementRepository.save(approvisionnement);
     }
 
@@ -145,16 +155,13 @@ public class ApprovisionnementServiceImpl implements ApprovisionnementService {
         Optional<Approvisionnement> approInfo = approvisionnementRepository.findById(id);
         if (approInfo.isPresent()) {
             Approvisionnement approvisionnement = approInfo.get();
+            List<LigneApprovisionnement> ligneApprovisionnements = approvisionnement.getLigneApprovisionnements();
+            for (LigneApprovisionnement lAppro : ligneApprovisionnements) {
+                lAppro.setActif(false);
+                ligneApprovisionnementRepository.save(lAppro);
+            }
             approvisionnement.setActif(false);
             approvisionnementRepository.save(approvisionnement);
-            List<LigneApprovisionnement> ligneApprovisionnements = approvisionnement.getLigneApprovisionnements();
-
-            /*
-            for (LigneApprovisionnement lAppro : ligneApprovisionnements) {
-
-            }*/
-            ligneApprovisionnementService.deleteLApproByNumero(approvisionnement.getCode());
-        //    approvisionnementRepository.delete(approvisionnement);
         }
     }
 }

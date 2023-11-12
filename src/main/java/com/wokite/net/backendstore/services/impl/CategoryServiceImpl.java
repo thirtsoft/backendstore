@@ -26,6 +26,7 @@ public class CategoryServiceImpl implements CategoryService {
         if (checkCategorie != null) {
             throw new IllegalArgumentException("This Category already exist");
         }
+        category.setActif(true);
         return categoryRepository.save(category);
     }
 
@@ -41,7 +42,6 @@ public class CategoryServiceImpl implements CategoryService {
         Category categoryResult = optionalCategory.get();
         categoryResult.setCode(category.getCode());
         categoryResult.setDesignation(category.getDesignation());
-
         return categoryRepository.save(categoryResult);
     }
 

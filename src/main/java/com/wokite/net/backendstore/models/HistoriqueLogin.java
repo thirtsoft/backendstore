@@ -37,5 +37,20 @@ public class HistoriqueLogin implements Serializable {
     @JoinColumn(name = "userId", nullable = false)
     private Utilisateur utilisateur;
 
+    @Column(name = "actif")
+    private int actif;
+
+    public void setActif(boolean actif) {
+        if (actif)
+            this.actif = 1;
+        else
+            this.actif = 0;
+    }
+
+    public boolean isActif() {
+        if (actif == 1)
+            return true;
+        return false;
+    }
 
 }

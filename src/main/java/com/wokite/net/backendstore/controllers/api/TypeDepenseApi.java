@@ -14,7 +14,7 @@ import static com.wokite.net.backendstore.utils.Constants.APP_ROOT;
 
 public interface TypeDepenseApi {
 
-    @PostMapping(value = APP_ROOT + "/categoriesCharges/create", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = APP_ROOT + "/typedepense/create", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Enregistrer un CategorieCharge",
             notes = "Cette méthode permet d'enregistrer un CategoryCharge", response = TypeDepense.class)
     @ApiResponses(value = {
@@ -24,7 +24,7 @@ public interface TypeDepenseApi {
     })
     ResponseEntity<TypeDepense> createCategoryCharge(@RequestBody TypeDepense typeDepense);
 
-    @PutMapping(value = APP_ROOT + "/categoriesCharges/update/{catId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = APP_ROOT + "/typedepense/update/{catId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Modifier un CategorieCharge par son ID",
             notes = "Cette méthode permet de modifier un CategorieCharge par son ID", response = TypeDepense.class)
     @ApiResponses(value = {
@@ -34,7 +34,7 @@ public interface TypeDepenseApi {
     })
     ResponseEntity<TypeDepense> updateCategoryCharge(@PathVariable Long catId, @RequestBody TypeDepense typeDepense);
 
-    @GetMapping(value = APP_ROOT + "/categoriesCharges/findById/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = APP_ROOT + "/typedepense/findById/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Rechercher un CategorieCharge par ID",
             notes = "Cette méthode permet de chercher un CategoryCharge par son ID", response = TypeDepense.class
     )
@@ -45,7 +45,7 @@ public interface TypeDepenseApi {
     })
     ResponseEntity<TypeDepense> getCategoryChargeById(@PathVariable(value = "id") Long id);
 
-    @GetMapping(value = APP_ROOT + "/categoriesCharges/all", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = APP_ROOT + "/typedepense/all", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Renvoi la liste des category de charge ",
             notes = "Cette méthode permet de chercher et renvoyer la liste des category de charge",
             responseContainer = "List<CategorieCharge>")
@@ -54,7 +54,7 @@ public interface TypeDepenseApi {
     })
     ResponseEntity<List<TypeDepense>> getAllCategoriesCharges();
 
-    @GetMapping(value = APP_ROOT + "/categoriesCharges/allCategoriesChargeOrderDesc", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = APP_ROOT + "/typedepense/allCategoriesChargeOrderDesc", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Renvoi la liste des CategorieCharge",
             notes = "Cette méthode permet de chercher et renvoyer la liste des CategorieCharge",
             responseContainer = "List<CategorieCharge>")
@@ -63,7 +63,7 @@ public interface TypeDepenseApi {
     })
     ResponseEntity<List<TypeDepense>> getAllCategoriesChargeOrderDesc();
 
-    @DeleteMapping(value = APP_ROOT + "/categoriesCharges/delete/{id}")
+    @DeleteMapping(value = APP_ROOT + "/typedepense/delete/{id}")
     @ApiOperation(value = "Supprimer un CategorieCharge par son ID",
             notes = "Cette méthode permet de supprimer un CategorieCharge par son ID", response = TypeDepense.class)
     @ApiResponses(value = {

@@ -26,6 +26,7 @@ public class FournisseurServiceImpl implements FournisseurService {
         if (codeFournisseur==fournisseur.getCode()){
             throw new ResourceNotFoundException("Fournisseur with code " + fournisseur.getCode() + " exist");
         }
+        fournisseur.setActif(true);
         return fournisseurRepository.save(fournisseur);
     }
 
@@ -47,7 +48,6 @@ public class FournisseurServiceImpl implements FournisseurService {
         fournisseurResult.setMobile(fournisseur.getMobile());
         fournisseurResult.setFax(fournisseur.getFax());
         fournisseurResult.setEmail(fournisseur.getEmail());
-
         return fournisseurRepository.save(fournisseurResult);
     }
 

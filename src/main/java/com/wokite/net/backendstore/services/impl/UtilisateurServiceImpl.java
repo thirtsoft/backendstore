@@ -106,6 +106,8 @@ public class UtilisateurServiceImpl implements UtilisateurService {
         if (!utilisateurRepository.existsById(idUser)) {
             throw new ResourceNotFoundException("User N ° " + idUser + "not found");
         }
-        utilisateurRepository.deleteById(idUser);
+        Utilisateur utilisateur = utilisateurRepository.findById(idUser).get();
+        utilisateur.setActif(false);
+        utilisateurRepository.save(utilisateur);
     }
 }

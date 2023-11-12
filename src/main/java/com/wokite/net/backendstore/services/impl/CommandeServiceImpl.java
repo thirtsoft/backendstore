@@ -10,7 +10,6 @@ import com.wokite.net.backendstore.services.CommandeService;
 import com.wokite.net.backendstore.services.LigneCommandeService;
 import com.wokite.net.backendstore.services.ProductService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -18,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -28,11 +26,23 @@ import java.util.Optional;
 @Slf4j
 public class CommandeServiceImpl implements CommandeService {
 
-    @Autowired private CommandeRepository commandeRepository;
+    private final CommandeRepository commandeRepository;
 
-    @Autowired private LigneCommandeService ligneCommandeService;
+    private final LigneCommandeService ligneCommandeService;
 
-    @Autowired private ProductService productService;
+    private final LigneCommandeRepository ligneCommandeRepository;
+
+    private final ProductService productService;
+
+    public CommandeServiceImpl(CommandeRepository commandeRepository,
+                               LigneCommandeService ligneCommandeService,
+                               LigneCommandeRepository ligneCommandeRepository,
+                               ProductService productService) {
+        this.commandeRepository = commandeRepository;
+        this.ligneCommandeService = ligneCommandeService;
+        this.ligneCommandeRepository = ligneCommandeRepository;
+        this.productService = productService;
+    }
 
     @Override
     public Commande saveCommande(Commande commande) {
@@ -57,6 +67,7 @@ public class CommandeServiceImpl implements CommandeService {
         List<LigneCommande> ligneCommandeList1 = commande.getLcomms();
         double total = 0;
         for (LigneCommande ligneCommande : ligneCommandeList1) {
+            ligneCommande.setActif(true);
             ligneCommande.setCommande(commande);
             ligneCommande.setNumero(commande.getNumeroCommande());
             ligneCommandeService.saveLigneCommande(ligneCommande);
@@ -67,20 +78,14 @@ public class CommandeServiceImpl implements CommandeService {
                 productService.updateProduct(product.getId(), product);
             }
             ligneCommande.setPrix(product.getPrixVente());
-
             total += (ligneCommande.getQuantite() * ligneCommande.getPrixCommande());
 
         }
-
         commande.setTotalCommande(total);
         commande.setStatus("VALIDEE");
         commande.setDateCommande(new Date());
-
-        System.out.println("Dernier Numero Commande " + commande.getNumeroCommande());
-
+        commande.setActif(true);
         return commandeRepository.save(commande);
-
-
     }
 
     @Override
@@ -92,13 +97,13 @@ public class CommandeServiceImpl implements CommandeService {
             LigneCommande ligneCommande = ligneCommandeList.get(compteur);
             Product product = productService.findProductById(ligneCommande.getProduct().getId()).get();
             ligneCommande.setProduct(product);
+            ligneCommande.setActif(true);
             ligneCommandeService.saveLigneCommande(ligneCommande);
-
             total += ligneCommande.getQuantite() * ligneCommande.getProduct().getPrixVente();
         }
-
         commande.setTotalCommande(total);
         commande.setLcomms(ligneCommandeList);
+        commande.setActif(true);
         return commandeRepository.save(commande);
     }
 
@@ -108,15 +113,14 @@ public class CommandeServiceImpl implements CommandeService {
             Commande nouvelleCommande = new Commande();
             List<LigneCommande> ligneCommandeList;
             ligneCommandeList = commande.getLcomms();
-
             for (int compteur = 0; compteur < ligneCommandeList.size(); compteur++) {
                 LigneCommande ligneCommande = ligneCommandeList.get(compteur);
+                ligneCommande.setActif(true);
                 Product product = ligneCommande.getProduct();
                 if (ligneCommande.getQuantite() <= product.getQtestock()) {
                     Product nouveauProduit = productService.findProductById(product.getId()).get();
                     nouveauProduit.setQtestock(product.getQtestock() - ligneCommande.getQuantite());
                     productService.saveProduct(nouveauProduit);
-
                 } else return ResponseEntity
                         .status(HttpStatus.BAD_REQUEST)
                         .body("This order cannot be created[Empty inventory]!(" + HttpStatus.BAD_REQUEST + ")");
@@ -127,7 +131,7 @@ public class CommandeServiceImpl implements CommandeService {
             nouvelleCommande.setTotalCommande(commande.getTotalCommande());
             nouvelleCommande.setStatus(commande.getStatus());
             nouvelleCommande.setDateCommande(new Date());
-
+            nouvelleCommande.setActif(true);
             nouvelleCommande.setLcomms(ligneCommandeService.saveListLigneCmd(ligneCommandeList));
 
             return ResponseEntity
@@ -254,8 +258,13 @@ public class CommandeServiceImpl implements CommandeService {
         Optional<Commande> commandeInfo = commandeRepository.findById(id);
         if (commandeInfo.isPresent()) {
             Commande commandeClient = commandeInfo.get();
-            ligneCommandeService.deleteLcomByNumero(commandeClient.getNumeroCommande());
-            commandeRepository.delete(commandeClient);
+            List<LigneCommande> ligneCommandeList = commandeClient.getLcomms();
+            for (LigneCommande ligneCommande: ligneCommandeList) {
+                ligneCommande.setActif(false);
+                ligneCommandeRepository.save(ligneCommande);
+            }
+            commandeClient.setActif(false);
+            commandeRepository.save(commandeClient);
         }
     }
 }

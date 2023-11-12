@@ -11,8 +11,6 @@ import java.util.List;
 @Repository
 public interface DepenseRepository extends JpaRepository<Depense, Long> {
 
-    Depense findByCodeCharge(String codeCharge);
-
     @Query("select sum(c.montantCharge) from Depense c where year(c.dateCharge) = year(current_date)")
     BigDecimal sumTotalOfChargeByYear();
 

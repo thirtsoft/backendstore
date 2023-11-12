@@ -24,6 +24,7 @@ public class PrestationServiceImpl implements PrestationService {
 
     @Override
     public Prestation savePrestation(Prestation prestation) {
+        prestation.setActif(true);
         return prestationRepository.save(prestation);
     }
 
@@ -33,16 +34,13 @@ public class PrestationServiceImpl implements PrestationService {
             throw new ResourceNotFoundException("Prestation that id is" + prestId + "not found");
         }
         Optional<Prestation> optionalPrestation = prestationRepository.findById(prestId);
-
         if (!optionalPrestation.isPresent()) {
             throw new ResourceNotFoundException("Prestation that id is" + prestId + "not found");
         }
         Prestation prestationResult = optionalPrestation.get();
-
         prestationResult.setDesignation(prestation.getDesignation());
         prestationResult.setMontant(prestation.getMontant());
         prestationResult.setDatePrestation(new Date());
-
         return prestationRepository.save(prestationResult);
     }
 

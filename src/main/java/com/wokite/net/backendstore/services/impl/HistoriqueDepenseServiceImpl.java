@@ -8,7 +8,6 @@ import com.wokite.net.backendstore.repository.HistoriqueDepenseRepository;
 import com.wokite.net.backendstore.services.DepenseService;
 import com.wokite.net.backendstore.services.HistoriqueDepenseService;
 import com.wokite.net.backendstore.services.UtilisateurService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,11 +20,19 @@ import java.util.Optional;
 @Transactional
 public class HistoriqueDepenseServiceImpl implements HistoriqueDepenseService {
 
-    @Autowired   private HistoriqueDepenseRepository historiqueDepenseRepository;
+    private final HistoriqueDepenseRepository historiqueDepenseRepository;
 
-    @Autowired  private UtilisateurService utilisateurService;
+    private final UtilisateurService utilisateurService;
 
-    @Autowired  private DepenseService depenseService;
+    private final DepenseService depenseService;
+
+    public HistoriqueDepenseServiceImpl(HistoriqueDepenseRepository historiqueDepenseRepository,
+                                        UtilisateurService utilisateurService,
+                                        DepenseService depenseService) {
+        this.historiqueDepenseRepository = historiqueDepenseRepository;
+        this.utilisateurService = utilisateurService;
+        this.depenseService = depenseService;
+    }
 
 
     @Override
@@ -76,6 +83,8 @@ public class HistoriqueDepenseServiceImpl implements HistoriqueDepenseService {
         if (!historiqueDepenseRepository.existsById(id)) {
             throw new ResourceNotFoundException("Historique chqrge " + id + "not found");
         }
-        historiqueDepenseRepository.deleteById(id);
+        HistoriqueDepense historiqueDepense = historiqueDepenseRepository.findById(id).get();
+        historiqueDepense.setActif(false);
+        historiqueDepenseRepository.save(historiqueDepense);
     }
 }

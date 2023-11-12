@@ -22,12 +22,7 @@ public class EmployeServiceImpl implements EmployeService {
 
     @Override
     public Employe saveEmploye(Employe employe) {
-        /*
-        if ((employeRepository.findByEmail(employe.getEmail()) != null)) {
-            throw new IllegalArgumentException("Ce Employe exist");
-        }
-
-         */
+        employe.setActif(true);
         return employeRepository.save(employe);
     }
 
@@ -40,9 +35,7 @@ public class EmployeServiceImpl implements EmployeService {
         if (!optionalEmploye.isPresent()) {
             throw new ResourceNotFoundException("Employee not found");
         }
-
         Employe empResult = optionalEmploye.get();
-
         empResult.setCni(employe.getCni());
         empResult.setNom(employe.getNom());
         empResult.setPrenom(employe.getPrenom());
@@ -50,9 +43,7 @@ public class EmployeServiceImpl implements EmployeService {
         empResult.setTelephone(employe.getTelephone());
         empResult.setTelephone2(employe.getTelephone2());
         empResult.setEmail(employe.getEmail());
-
         return employeRepository.save(empResult);
-
     }
 
     @Override

@@ -5,6 +5,7 @@ import com.wokite.net.backendstore.models.Avoir;
 import com.wokite.net.backendstore.models.LigneAvoir;
 import com.wokite.net.backendstore.models.Product;
 import com.wokite.net.backendstore.repository.AvoirRepository;
+import com.wokite.net.backendstore.repository.LigneAvoirRepository;
 import com.wokite.net.backendstore.services.AvoirService;
 import com.wokite.net.backendstore.services.LigneAvoirService;
 import com.wokite.net.backendstore.services.ProductService;
@@ -30,11 +31,17 @@ public class AvoirServiceImpl implements AvoirService {
 
     private final LigneAvoirService ligneAvoirService;
 
+    private final LigneAvoirRepository ligneAvoirRepository;
+
     private final ProductService productService;
 
-    public AvoirServiceImpl(AvoirRepository avoirRepository, LigneAvoirService ligneAvoirService, ProductService productService) {
+    public AvoirServiceImpl(AvoirRepository avoirRepository,
+                            LigneAvoirService ligneAvoirService,
+                            LigneAvoirRepository ligneAvoirRepository,
+                            ProductService productService) {
         this.avoirRepository = avoirRepository;
         this.ligneAvoirService = ligneAvoirService;
+        this.ligneAvoirRepository = ligneAvoirRepository;
         this.productService = productService;
     }
 
@@ -42,28 +49,21 @@ public class AvoirServiceImpl implements AvoirService {
     public Avoir saveAvoir(Avoir avoir) {
         logger.info("Avoir {}", avoir);
         avoirRepository.save(avoir);
-
         List<LigneAvoir> ligneAvoirs = avoir.getLavoirs();
-
         double total = 0;
         for (LigneAvoir lavoir : ligneAvoirs) {
             lavoir.setAvoir(avoir);
             lavoir.setNumeroAvoir(avoir.getReference());
-
             ligneAvoirService.saveLigneAvoir(lavoir);
-
             Product product = productService.findProductById(lavoir.getProduct().getId()).get();
-
             lavoir.setPrixLigneAvoir(product.getPrixVente());
-
+            lavoir.setActif(true);
             total += (lavoir.getQuantite() * product.getPrixVente());
-
         }
-
         avoir.setTotalAvoir(total);
         avoir.setStatus("valider");
         avoir.setDateAvoir(new Date());
-
+        avoir.setActif(true);
         return avoirRepository.save(avoir);
     }
 
@@ -72,20 +72,15 @@ public class AvoirServiceImpl implements AvoirService {
         if (!avoirRepository.existsById(id)) {
             throw new ResourceNotFoundException("Avoir that id is" + id + "not found");
         }
-
         Optional<Avoir> optionalAvoir = avoirRepository.findById(id);
-
         if (!optionalAvoir.isPresent()) {
             throw new ResourceNotFoundException("Avoir that id is" + optionalAvoir + "not found");
         }
-
         Avoir avoirResult = optionalAvoir.get();
-
         avoirResult.setReference(avoir.getReference());
         avoirResult.setFournisseur(avoir.getFournisseur());
         avoirResult.setTotalAvoir(avoir.getTotalAvoir());
         avoirResult.setStatus(avoir.getStatus());
-
         return avoirRepository.save(avoirResult);
     }
 
@@ -94,7 +89,6 @@ public class AvoirServiceImpl implements AvoirService {
         if (!avoirRepository.existsById(id)) {
             throw new ResourceNotFoundException("Avoir that id is" + id + "not found");
         }
-
         return avoirRepository.findById(id);
     }
 
@@ -113,14 +107,18 @@ public class AvoirServiceImpl implements AvoirService {
         return avoirRepository.findLitAvoirByFournisseurId(fourId);
     }
 
-
     @Override
     public void deleteAvoir(Long id) {
         Optional<Avoir> avoirInfo = avoirRepository.findById(id);
         if (avoirInfo.isPresent()) {
             Avoir avoir = avoirInfo.get();
-            ligneAvoirService.deleteLAVoirByNumero(avoir.getReference());
-            avoirRepository.delete(avoir);
+            List<LigneAvoir> ligneAvoirs = avoir.getLavoirs();
+            for (LigneAvoir ligneAvoir: ligneAvoirs) {
+                ligneAvoir.setActif(false);
+                ligneAvoirRepository.save(ligneAvoir);
+            }
+            avoir.setActif(false);
+            avoirRepository.save(avoir);
         }
     }
 }
